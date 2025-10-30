@@ -1,0 +1,19 @@
+{
+  "short_name": "roam.io",
+  "name": "roam.io",
+  "icons": [
+    {
+      "src": "main_log.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
