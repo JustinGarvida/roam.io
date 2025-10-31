@@ -17,7 +17,7 @@ Please install:
 ## 1. Install Dependencies
 Navigate to the project folder
 ```bash
-cd roam.io
+cd roam.io/frontend
 ```
 
 Inside the project folder, run:
