@@ -19,10 +19,17 @@ let pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-app.get("/api/login", (req, res) => {
+app.post("/api/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
-  console.log("HI");
+  res.status(200).json({ message: "Login successful" });
+});
+
+app.post("/api/signup", (req, res) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  console.log(email + " " + password);
+  res.status(200).json({ message: "Signup successful" });
 });
 
 let PORT = process.env.PORT || 4000;

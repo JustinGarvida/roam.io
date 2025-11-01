@@ -1,30 +1,38 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Signup() {
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
+  let [confirmPassword, setConfirm] = useState("");
   let [message, setMessage] = useState("");
   let [loading, setLoading] = useState(false);
   let navigate = useNavigate();
 
-  let handleLogin = async (e) => {
-    e.preventDefault();
+  let handleSignup = async (e) => {
     setMessage("");
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
 
     try {
       setLoading(true);
-      let res = await fetch("http://localhost:4000/api/login", {
+      let res = await fetch("http://localhost:4000/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
+      let data = await res.json();
+
       if (!res.ok) {
-        setMessage("Login failed");
+        setMessage(data.message || "Signup failed");
       } else {
-        setMessage("Login successful!");
-        setTimeout(() => navigate("/home"), 1000);
+        setMessage("Account created successfully!");
+        setTimeout(() => navigate("/login"), 1500);
       }
     } catch (err) {
       console.error(err);
@@ -38,13 +46,13 @@ function Login() {
     <div className="d-flex align-items-center justify-content-center vh-100">
       <div className="card shadow-lg p-4" style={{ width: "400px" }}>
         <div className="text-center mb-4">
-          <h2 className="fw-bold text-primary">Welcome Back</h2>
-          <p className="text-muted">Log in to your account</p>
+          <h2 className="fw-bold text-primary">Create an Account</h2>
+          <p className="text-muted">Sign up to get started</p>
         </div>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSignup}>
           <div className="mb-3">
-            <label className="form-label fw-bold">Email address</label>
+            <label className="form-label fw-semibold">Email address</label>
             <input
               type="email"
               className="form-control"
@@ -55,7 +63,7 @@ function Login() {
           </div>
 
           <div className="mb-3">
-            <label className="form-label fw-bold">Password</label>
+            <label className="form-label fw-semibold">Password</label>
             <input
               type="password"
               className="form-control"
@@ -65,12 +73,23 @@ function Login() {
             />
           </div>
 
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Confirm Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={confirmPassword}
+              onChange={(password) => setConfirm(password.target.value)}
+              required
+            />
+          </div>
+
           <button
             type="submit"
             className="btn btn-primary w-100"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Log In"}
+            {loading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 
@@ -82,9 +101,9 @@ function Login() {
 
         <div className="text-center mt-3">
           <small className="text-muted">
-            Don’t have an account?{" "}
-            <a href="/signup" className="text-decoration-none">
-              Sign up
+            Already have an account?{" "}
+            <a href="/login" className="text-decoration-none">
+              Log in
             </a>
           </small>
         </div>
@@ -93,4 +112,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Signup;
