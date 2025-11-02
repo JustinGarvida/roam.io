@@ -3,6 +3,36 @@ import { useNavigate } from "react-router-dom";
 
 // test push to see if username appears now
 function Home() {
+  let trips = [
+    {
+      id: 1,
+      destination: "Paris",
+      startDate: "12-10-2025",
+      endDate: "12-31-2025",
+      flights: ["Flight to Paris", "Returning Flight"],
+      hotels: ["Paris Hotel"],
+      attractions: ["Eiffel Tower"],
+    },
+    {
+      id: 2,
+      destination: "Beijing",
+      startDate: "3-15-2026",
+      endDate: "3-29-2026",
+      flights: ["Flight to Beijing", "Returning Flight"],
+      hotels: ["Beijing Hotel"],
+      attractions: ["Great Wall of China"],
+    },
+    {
+      id: 3,
+      destination: "Tokyo",
+      startDate: "6-18-2026",
+      endDate: "6-30-2026",
+      flights: ["Flight to Tokyo", "Returning Flight"],
+      hotels: ["Tokyo Hotel"],
+      attractions: ["Tokyo Tower"],
+    }
+  ];
+
   return (
     <div>
       <section
@@ -88,6 +118,21 @@ function Home() {
               <p>Export your trip to a calendar to share with others.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="py-5 text-center">
+        <div>
+          <h2 class="fw-bold mb-4">Current Trip Plans</h2>
+        </div>
+        <div>
+          {trips.map((trip) => (
+            <p key={trip.id}>
+              <span class="mx-2">Destination: {trip.destination}</span>
+              <span>Start Date: {trip.startDate}</span>
+              <span class="mx-2">End Date: {trip.endDate}</span>
+            </p>
+          ))}
         </div>
       </section>
 
