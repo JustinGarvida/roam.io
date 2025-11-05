@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// test push to see if username appears now
 function Home() {
+  let navigate = useNavigate();
   let trips = [
     {
       id: 1,
@@ -48,7 +48,7 @@ function Home() {
         <div>
           <h1 class="display-4 fw-bold mb-3">Plan Your Dream Trip <i class="bi bi-globe-americas fs-1 text-primary mb-3"></i></h1>
           <p class="lead mb-4">Get your flights, hotels, attractions, and maps tailored to your travel style.</p>
-          <button onClick={() => alert("This should redirect to the Survey")}
+          <button onClick={() => navigate('/survey')}
           class="btn btn-primary btn-lg px-4 shadow">Start Your Vacation Here</button>
         </div>
       </section>
