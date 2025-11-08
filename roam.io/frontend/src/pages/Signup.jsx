@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../services/supabaseClient";
 
 function Signup() {
   let [email, setEmail] = useState("");
@@ -20,19 +21,16 @@ function Signup() {
 
     try {
       setLoading(true);
-      let res = await fetch("http://localhost:4000/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      let { data, error } = await supabase.auth.signUp({
+        email,
+        password,
       });
 
-      let data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data.message || "Signup failed");
+      if (error) {
+        setMessage(error.message);
       } else {
-        setMessage("Account created successfully!");
-        setTimeout(() => navigate("/login"), 1500);
+        setMessage("Account created! Check your email for confirmation.");
+        setTimeout(() => navigate("/login"), 2000);
       }
     } catch (err) {
       console.error(err);
