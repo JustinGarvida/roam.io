@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { PencilSquare, Trash, Plus, Check, X } from "react-bootstrap-icons";
 
 function PlansDashboard() {
   const [plans, setPlans] = useState([
@@ -58,7 +57,7 @@ function PlansDashboard() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="fw-bold text-primary">PLANS</h1>
         <button className="btn btn-primary" onClick={handleAddClick}>
-          <Plus className="me-2" /> Add Plan
+          Add Plan
         </button>
       </div>
 
@@ -121,10 +120,10 @@ function PlansDashboard() {
                           className="btn btn-success btn-sm me-2"
                           onClick={() => handleSaveClick(plan.id)}
                         >
-                          <Check />
+                          Save
                         </button>
                         <button className="btn btn-secondary btn-sm" onClick={handleCancel}>
-                          <X />
+                          Cancel
                         </button>
                       </td>
                     </>
@@ -139,13 +138,13 @@ function PlansDashboard() {
                           className="btn btn-outline-primary btn-sm me-2"
                           onClick={() => handleEditClick(plan)}
                         >
-                          <PencilSquare />
+                          Edit
                         </button>
                         <button
                           className="btn btn-outline-danger btn-sm"
                           onClick={() => handleDelete(plan.id)}
                         >
-                          <Trash />
+                          Delete
                         </button>
                       </td>
                     </>
@@ -198,10 +197,10 @@ function PlansDashboard() {
                   </td>
                   <td className="text-center">
                     <button className="btn btn-success btn-sm me-2" onClick={handleAddSave}>
-                      <Check />
+                      Save
                     </button>
                     <button className="btn btn-secondary btn-sm" onClick={handleCancel}>
-                      <X />
+                      Cancel
                     </button>
                   </td>
                 </tr>
