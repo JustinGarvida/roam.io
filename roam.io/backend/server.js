@@ -11,6 +11,7 @@ let app = express();
 //Need cors if frontend and backend are on different ports
 app.use(cors());
 app.use(express.json());
+
 let pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
