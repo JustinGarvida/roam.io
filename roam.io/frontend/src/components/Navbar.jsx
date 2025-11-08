@@ -15,7 +15,7 @@ function NavBar() {
     fetchUser();
 
     let { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setUser(session?.user || null);
       }
     );
@@ -24,11 +24,12 @@ function NavBar() {
       listener.subscription.unsubscribe();
     };
   }, []);
-  const handleLogout = async () => {
+  let handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
     navigate("/login");
   };
+
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
       <Container>
