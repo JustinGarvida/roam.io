@@ -1,48 +1,51 @@
 import React, { useState } from "react";
 
 function PlansDashboard() {
-  const [plans, setPlans] = useState([
+  let [plans, setPlans] = useState([
     { id: 1, name: "Plan 1", from: "xxx", to: "yyy", budget: "$1200" },
     { id: 2, name: "Plan 2", from: "aaa", to: "bbb", budget: "$800" },
   ]);
 
-  const [editingPlan, setEditingPlan] = useState(null);
-  const [addingNew, setAddingNew] = useState(false);
-  const [formData, setFormData] = useState({ name: "", from: "", to: "", budget: "" });
+  let [editingPlan, setEditingPlan] = useState(null);
+  let [addingNew, setAddingNew] = useState(false);
+  let [formData, setFormData] = useState({ name: "", from: "", to: "", budget: "" });
 
-  const handleEditClick = (plan) => {
+
+  let [selectedPlan, setSelectedPlan] = useState(null);
+
+  let handleEditClick = (plan) => {
     setAddingNew(false);
     setEditingPlan(plan.id);
     setFormData({ name: plan.name, from: plan.from, to: plan.to, budget: plan.budget });
   };
 
-  const handleSaveClick = (id) => {
+  let handleSaveClick = (id) => {
     setPlans(plans.map((p) => (p.id === id ? { ...p, ...formData } : p)));
     setEditingPlan(null);
   };
 
-  const handleCancel = () => {
+  let handleCancel = () => {
     setEditingPlan(null);
     setAddingNew(false);
     setFormData({ name: "", from: "", to: "", budget: "" });
   };
 
-  const handleDelete = (id) => {
+  let handleDelete = (id) => {
     setPlans(plans.filter((p) => p.id !== id));
   };
 
-  const handleChange = (e) => {
+  let handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAddClick = () => {
+  let handleAddClick = () => {
     setAddingNew(true);
     setEditingPlan(null);
     setFormData({ name: "", from: "", to: "", budget: "" });
   };
 
-  const handleAddSave = () => {
-    const newPlan = {
+  let handleAddSave = () => {
+    let newPlan = {
       id: plans.length > 0 ? plans[plans.length - 1].id + 1 : 1,
       ...formData,
     };
@@ -51,9 +54,17 @@ function PlansDashboard() {
     setFormData({ name: "", from: "", to: "", budget: "" });
   };
 
+
+  let handleViewPlan = (plan) => {
+    setSelectedPlan(plan);
+  };
+
+  let closePopup = () => {
+    setSelectedPlan(null);
+  };
+
   return (
     <div className="container py-5">
-      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="fw-bold text-primary">PLANS</h1>
         <button className="btn btn-primary" onClick={handleAddClick}>
@@ -61,7 +72,6 @@ function PlansDashboard() {
         </button>
       </div>
 
-      {/* Table */}
       {plans.length > 0 || addingNew ? (
         <div className="table-responsive shadow-sm rounded">
           <table className="table table-bordered table-striped align-middle">
@@ -129,7 +139,14 @@ function PlansDashboard() {
                     </>
                   ) : (
                     <>
-                      <td>{plan.name}</td>
+                      <td>
+                        <button
+                          onClick={() => handleViewPlan(plan)}
+                          className="btn btn-link p-0 text-decoration-none"
+                        >
+                          {plan.name}
+                        </button>
+                      </td>
                       <td>{plan.from}</td>
                       <td>{plan.to}</td>
                       <td>{plan.budget}</td>
@@ -152,7 +169,7 @@ function PlansDashboard() {
                 </tr>
               ))}
 
-              {/* New Plan Row */}
+
               {addingNew && (
                 <tr>
                   <td>
@@ -214,6 +231,33 @@ function PlansDashboard() {
           <button className="btn btn-link text-primary" onClick={handleAddClick}>
             Create One Now
           </button>
+        </div>
+      )}
+
+      {selectedPlan && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content shadow-lg">
+              <div className="modal-header bg-primary text-white">
+                <h5 className="modal-title">{selectedPlan.name} Overview</h5>
+                <button type="button" className="btn-close btn-close-white" onClick={closePopup}></button>
+              </div>
+              <div className="modal-body">
+                <p><strong>From:</strong> {selectedPlan.from}</p>
+                <p><strong>To:</strong> {selectedPlan.to}</p>
+                <p><strong>Budget:</strong> {selectedPlan.budget}</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={closePopup}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
