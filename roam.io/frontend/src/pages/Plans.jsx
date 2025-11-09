@@ -170,7 +170,7 @@ function PlansDashboard() {
               ))}
 
 
-              {addingNew && (
+              {adding    && (
                 <tr>
                   <td>
                     <input
