@@ -36,11 +36,3 @@ let PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 });
-
-let surveyData = [];
-
-app.post("/api/survey", (req, res) => {
-  surveyData.push(req.body);
-  console.log("Current survey data:", surveyData);
-  res.status(200).json({ message: "Survey saved locally" });
-});
