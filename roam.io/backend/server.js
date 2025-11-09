@@ -32,6 +32,24 @@ app.post("/api/signup", (req, res) => {
   res.status(200).json({ message: "Signup successful" });
 });
 
+// CURRENTLY RESEARCHING API AND TRYING TO FIGURE OUT TOKEN OR BETTER ALTERNATIVE
+app.get("/flights", (req, res) => {
+  let origin = req.query.origin;
+  let destination = req.query.destination;
+  let date = req.query.date;
+  let tokenUrl = `https://test.api.amadeus.com/v1/security/oauth2/token`;
+  let flightUrl = `https://test.api.amadeus.com/v1/shopping/flight-dates?origin=${origin}&destination=${destination}&departureDate=${date}&oneWay=true&max=5`;
+  console.log("Client requested /flights");
+  axios(url).then(response => {
+    console.log("API response received");
+    res.json(response.data);
+  }).catch(error => {
+    console.log("Error when requesting from API", error);
+    res.status(500).json({});
+  });
+  console.log("Request sent to API");
+});
+
 let PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
