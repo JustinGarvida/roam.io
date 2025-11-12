@@ -38,7 +38,6 @@ async function getHotelsByCoordinates({ lat, lng, miles, amadeusToken }) {
     address: h.address?.lines?.join(", "),
     city: h.address?.cityName,
     countryCode: h.address?.countryCode,
-    rating: h.rating ?? h.hotelRating?.rating ?? null,
   }));
 }
 
