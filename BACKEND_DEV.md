@@ -55,3 +55,20 @@ The keys can be found either shared secret locker or through other form of commu
 # From the api diretory
 roam.io/backend/api node server.js
 ```
+
+## 4.  Setup Vercel Development
+
+Install Vercel into NPM
+```bash
+npm install -g vercel
+```
+
+Login into Vercel
+```bash
+vercel login
+```
+
+Once logged in, you can test the Vercel project
+```bash
+vercel deploy # NOTE: THIS IS NOT WORKING FOR BACKEND YET, SECTION 3 WILL WORK LOCALLY
+```
