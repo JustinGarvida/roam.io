@@ -11,15 +11,9 @@ const { getHotels } = require("../utils/hotels/hotelList");
  */
 router.get("/", async (req, res) => {
   try {
-    const {
-      zipCode,
-      location,
-      miles = 20,
-      limit,
-      countryCode = "US",
-    } = req.query;
+    const { zipCode, location, miles = 20, countryCode = "US" } = req.query;
 
-    // Validate that at least one input is provided
+    // Option to pick between ZIP or Location. If there's neither in the param, throw an error
     if (!zipCode && !location) {
       return res.status(400).json({
         error:
@@ -28,13 +22,11 @@ router.get("/", async (req, res) => {
     }
 
     const milesNum = Number(miles);
-    const limitNum = limit ? Number(limit) : undefined;
 
     const hotels = await getHotels({
       zipCode,
       location,
       miles: milesNum,
-      limit: limitNum,
       countryCode,
     });
 

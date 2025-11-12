@@ -39,13 +39,3 @@ async function getCoordinatesByLocation(location) {
 }
 
 module.exports = { getCoordinatesByZip, getCoordinatesByLocation };
-
-(async function runTests() {
-  console.log("=== Testing getCoordinatesByZip ===");
-  const coordsZip = await getCoordinatesByZip("19104", "US");
-  console.log("ZIP Result:", coordsZip);
-
-  console.log("\n=== Testing getCoordinatesByLocation ===");
-  const coordsLoc = await getCoordinatesByLocation("Philadelphia, PA");
-  console.log("Location Result:", coordsLoc);
-})();

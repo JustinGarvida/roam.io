@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import pg from "pg";
-import dotenv from "dotenv";
+const express = require("express");
+const cors = require("cors");
+const pg = require("pg");
+const dotenv = require("dotenv");
 
 dotenv.config();
 let { Pool } = pg;
@@ -34,9 +34,9 @@ app.post("/api/signup", (req, res) => {
 });
 
 // Define + Register Routes
-const hotelRoutes = require('./routes/hotels')
+const hotelRoutes = require("./routes/hotels");
 
-app.use(("/api/hotels", hotelRoutes))
+app.use("/api/hotels", hotelRoutes);
 
 let PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
