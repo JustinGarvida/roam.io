@@ -1,6 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const { getAmadeusToken } = require("../utils/amadeusToken");
 
-// An access token is required to use the Almadeus API. Because of this, we need to store the token locally
-let accessToken = null;
-let tokenExpiresAt = 0;  
+// For a smaller scaled application, we decided to always get a token on any call to the Amadeus API
+
+// Get Hotels
+router.get("/", async (req, res) =>{
+    let amaduesToken = getAmadeusToken()
+
+
+
+}
+)
