@@ -30,7 +30,7 @@ npm install
 ## 2. Setup .env file for API Keys
 Navigate to the project folder
 ```bash
-cd roam.io/backend
+cd roam.io/backend/api
 ```
 
 Inside the project folder, make sure to create a .env file:
@@ -52,6 +52,6 @@ The keys can be found either shared secret locker or through other form of commu
 
 ## 3.  Run Development Server
 ```bash
-# From the root directory
-node server.js
+# From the api diretory
+roam.io/backend/api node server.js
 ```
