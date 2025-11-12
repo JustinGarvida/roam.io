@@ -39,6 +39,13 @@ const hotelRoutes = require("./routes/hotels");
 app.use("/api/hotels", hotelRoutes);
 
 let PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log("Server is running on port " + PORT);
-});
+
+// Only listen when running directly with `node server.js`
+// Vercel will NOT hit this path; it will just use `module.exports = app`
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log("Server is running on port " + PORT);
+  });
+}
+
+module.exports = app;
