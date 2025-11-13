@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import pg from "pg";
-import dotenv from "dotenv";
+const express = require("express");
+const cors = require("cors");
+const pg = require("pg");
+const dotenv = require("dotenv");
 
 dotenv.config();
 let { Pool } = pg;
@@ -33,7 +33,19 @@ app.post("/api/signup", (req, res) => {
   res.status(200).json({ message: "Signup successful" });
 });
 
+// Define + Register Routes
+const hotelRoutes = require("./routes/hotels");
+
+app.use("/api/hotels", hotelRoutes);
+
 let PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log("Server is running on port " + PORT);
-});
+
+// Only listen when running directly with `node server.js`
+// Vercel will NOT hit this path; it will just use `module.exports = app`
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log("Server is running on port " + PORT);
+  });
+}
+
+module.exports = app;
