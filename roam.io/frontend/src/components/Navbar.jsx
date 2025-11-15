@@ -52,6 +52,7 @@ function NavBar() {
           <Nav className="ms-auto align-items-center">
             {!user ? (
               <>
+                <Nav.Link as={Link} to="/hotels"></Nav.Link>
                 <Nav.Link as={Link} to="/login">
                   Login
                 </Nav.Link>
