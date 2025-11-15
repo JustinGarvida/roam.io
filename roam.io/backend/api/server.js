@@ -35,8 +35,10 @@ app.post("/api/signup", (req, res) => {
 
 // Define + Register Routes
 const hotelRoutes = require("./routes/hotels");
+const flightRoutes = require("./routes/flights");
 
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/flights", flightRoutes);
 
 let PORT = process.env.PORT || 4000;
 
