@@ -22,9 +22,14 @@ function NavBar() {
         <Navbar.Toggle aria-controls="main-navbar" />
         <Navbar.Collapse id="main-navbar">
           <Nav className="ms-auto align-items-center">
+            <Nav.Link as={Link} to="/hotels">
+              Hotel Search
+            </Nav.Link>
+
             <Nav.Link as={Link} to="/login">
               Login
             </Nav.Link>
+
             <Button as={Link} to="/signup" variant="primary" className="ms-3">
               Sign Up
             </Button>
