@@ -3,7 +3,10 @@ import React, { useState } from "react";
 import HotelCard from "../components/hotels/HotelCard";
 import HotelModal from "../components/hotels/HotelModal";
 
-const API_BASE = "https://roam-io-backend.vercel.app";
+
+const API_BASE = process.env.REACT_APP_API_BASE
+// const API_BASE = "https://roam-io-backend.vercel.app";
+console.log(API_BASE)
 const PAGE_SIZE = 20; 
 
 function Hotels() {
@@ -40,7 +43,7 @@ function Hotels() {
 
       const hotelsArray = Array.isArray(data.results) ? data.results : [];
       setHotels(hotelsArray);
-      setCurrentPage(1); // ✅ reset to first page on new search
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
       setError("Something went wrong while fetching hotels.");
@@ -57,7 +60,6 @@ function Hotels() {
     setSelectedHotel(null);
   };
 
-  // ✅ Derived pagination values
   const totalPages = Math.ceil(hotels.length / PAGE_SIZE) || 1;
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const visibleHotels = hotels.slice(startIndex, startIndex + PAGE_SIZE);
@@ -130,7 +132,6 @@ function Hotels() {
         ))}
       </div>
 
-      {/* ✅ Pagination controls */}
       {hotels.length > PAGE_SIZE && (
         <nav aria-label="Hotel pagination">
           <ul className="pagination justify-content-center mt-3">
@@ -140,7 +141,6 @@ function Hotels() {
               </button>
             </li>
 
-            {/* Simple page numbers – you can later make this smarter if needed */}
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <li
                 key={page}
@@ -165,7 +165,6 @@ function Hotels() {
         </nav>
       )}
 
-      {/* POPUP / MODAL */}
       {selectedHotel && (
         <HotelModal hotel={selectedHotel} onClose={handleCloseModal} />
       )}
