@@ -69,6 +69,12 @@ function Login() {
             />
           </div>
 
+          <div className="text-end mb-3">
+            <a href="/forgot-password" className="text-decoration-none">
+              Forgot password?
+            </a>
+          </div>
+
           <button
             type="submit"
             className="btn btn-primary w-100"
