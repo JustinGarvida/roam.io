@@ -16,6 +16,7 @@ export async function generateTripFromSurvey(finalData) {
   const locationData = await locationRes.json();
   const location = locationData.location || locationData;
 
+  // TODO: ADD PLAN API ROUTE
   const plansRes = await fetch(`${BASE_URL}/api/trip-plans`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
