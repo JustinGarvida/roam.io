@@ -30,7 +30,7 @@ function Signup() {
         setMessage(error.message);
       } else {
         setMessage("Account created! Check your email for confirmation.");
-        setTimeout(() => navigate("/login"), 2000);
+        setTimeout(() => navigate("/"), 2000);
       }
     } catch (err) {
       console.error(err);
