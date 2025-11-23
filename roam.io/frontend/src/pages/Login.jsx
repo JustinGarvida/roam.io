@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/auth";
 
 function Login() {
-  //
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   let [message, setMessage] = useState("");
   let [loading, setLoading] = useState(false);
+  let [redirecting, setRedirecting] = useState(false);
   let navigate = useNavigate();
 
   let handleLogin = async (e) => {
@@ -25,10 +25,14 @@ function Login() {
         setMessage(error.message);
       } else {
         setMessage("Login successful!");
+
         if (data.session) {
           localStorage.setItem("supabaseSession", JSON.stringify(data.session));
         }
-        setTimeout(() => navigate("/home"), 1000);
+
+        setRedirecting(true);
+
+        setTimeout(() => navigate("/"), 1000);
       }
     } catch (err) {
       console.error(err);
@@ -37,6 +41,14 @@ function Login() {
       setLoading(false);
     }
   };
+
+  if (redirecting) {
+    return (
+      <div className="vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border text-primary" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div className="d-flex align-items-center justify-content-center vh-100">
@@ -86,7 +98,7 @@ function Login() {
 
         <div className="text-center mt-3">
           <small className="text-muted">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <a href="/signup" className="text-decoration-none">
               Sign up
             </a>

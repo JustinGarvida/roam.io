@@ -8,6 +8,7 @@ function Signup() {
   let [confirmPassword, setConfirm] = useState("");
   let [message, setMessage] = useState("");
   let [loading, setLoading] = useState(false);
+  let [redirecting, setRedirecting] = useState(false);
   let navigate = useNavigate();
 
   let handleSignup = async (e) => {
@@ -30,6 +31,9 @@ function Signup() {
         setMessage(error.message);
       } else {
         setMessage("Account created! Check your email for confirmation.");
+
+        setRedirecting(true);
+
         setTimeout(() => navigate("/"), 2000);
       }
     } catch (err) {
@@ -39,6 +43,14 @@ function Signup() {
       setLoading(false);
     }
   };
+
+  if (redirecting) {
+    return (
+      <div className="vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border text-primary" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div className="d-flex align-items-center justify-content-center vh-100">
