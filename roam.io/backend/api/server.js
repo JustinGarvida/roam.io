@@ -1,10 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const pg = require("pg");
 const dotenv = require("dotenv");
 
 dotenv.config();
-let { Pool } = pg;
 
 let app = express();
 
@@ -12,12 +10,24 @@ let app = express();
 app.use(cors());
 app.use(express.json());
 
-let pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+app.get("/", (req, res) => {
+  res.send(`
+    <html>
+      <head><title>roam.io API</title></head>
+      <body style="font-family: Arial; padding: 20px;">
+        <h1>Welcome to the roam.io API</h1>
+        <p>For more information on the API source code, visit the GitHub repo:</p>
+
+        <p>
+          <a href="https://github.com/JustinGarvida/roam.io/tree/main/roam.io/backend" 
+             target="_blank" 
+             style="font-size: 18px;">
+            View Backend Repository
+          </a>
+        </p>
+      </body>
+    </html>
+  `);
 });
 
 app.post("/api/login", (req, res) => {
