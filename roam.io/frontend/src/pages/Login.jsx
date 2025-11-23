@@ -28,7 +28,7 @@ function Login() {
         if (data.session) {
           localStorage.setItem("supabaseSession", JSON.stringify(data.session));
         }
-        setTimeout(() => navigate("/home"), 1000);
+        setTimeout(() => navigate("/"), 1000);
       }
     } catch (err) {
       console.error(err);
