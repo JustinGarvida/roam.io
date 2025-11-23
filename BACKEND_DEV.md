@@ -46,6 +46,7 @@ AMADEUS_API_SECRET=
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
 OPEN_CAGE_API_KEY=
+OPEN_API_KEY=
 ```
 
 The keys can be found either shared secret locker or through other form of communication. Make sure to save these keys and these values for development ease
