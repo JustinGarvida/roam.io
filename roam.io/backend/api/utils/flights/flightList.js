@@ -46,8 +46,8 @@ async function getCheapestFlightDates({origin, destination, departureDate, oneWa
   } else {
     items = [];
   }
-
-  return items.map((item) => ({
+  
+  let allFlights = items.map((item) => ({
     origin: item.origin,
     destination: item.destination,
     departureDate: item.departureDate,
@@ -55,6 +55,14 @@ async function getCheapestFlightDates({origin, destination, departureDate, oneWa
     price: item.price?.total,
     links: item.links,
   }));
+
+  if (allFlights.length === 0) {
+    return null;
+  }
+
+  allFlights.sort((a, b) => a.price - b.price);
+  
+  return allFlights[0];
 }
 
 module.exports = { getCheapestFlightDates };
