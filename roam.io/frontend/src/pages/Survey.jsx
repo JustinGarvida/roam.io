@@ -15,7 +15,6 @@ function Survey() {
     activitiesOther: "",
     climatePreference: "",
     travelVibe: "",
-    accommodationType: "",
     departureCity: "",
     notes: "",
     tripStartDate: null,
@@ -67,7 +66,6 @@ const handleSubmit = async (e) => {
       .join(", "),
     climatePreference: formData.climatePreference,
     travelVibe: formData.travelVibe,
-    accommodationType: formData.accommodationType,
     departureCity: formData.departureCity,
     notes: formData.notes,
     tripStartDate: formatDate(formData.tripStartDate),
@@ -75,6 +73,7 @@ const handleSubmit = async (e) => {
   };
 
   try {
+    console.log(finalData)
     const { location, plans } = await generateTripFromSurvey(finalData);
 
     navigate("/trip-plans", {
@@ -188,23 +187,6 @@ const handleSubmit = async (e) => {
                 { value: "adventure", label: "Non-stop adventure" },
               ]}
               value={formData.travelVibe}
-              multiple={false}
-              onChange={setFieldValue}
-            />
-          </div>
-
-          <div className="question-bubble">
-            <MultiChoiceWithOtherQuestion
-              label="Preferred Accommodation Type"
-              name="accommodationType"
-              options={[
-                { value: "budget", label: "Budget" },
-                { value: "midrange", label: "Mid-range" },
-                { value: "luxury", label: "Luxury" },
-                { value: "unique", label: "Boutique / unique stays" },
-                { value: "noPreference", label: "No preference" },
-              ]}
-              value={formData.accommodationType}
               multiple={false}
               onChange={setFieldValue}
             />

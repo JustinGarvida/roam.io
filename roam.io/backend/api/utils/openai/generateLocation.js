@@ -4,22 +4,27 @@ const openai = require("../openAiClient");
 
 async function generateLocation(surveyData) {
   const promptPath = path.join(__dirname, "prompt.txt");
-  const systemPrompt = await fs.readFile(promptPath, "utf8");
+  let promptTemplate = await fs.readFile(promptPath, "utf8");
 
-  const messages = [
-    { role: "system", content: systemPrompt },
-    {
-      role: "user",
-      content: JSON.stringify(surveyData, null, 2),
-    },
-  ];
+  const surveyJsonString = JSON.stringify(surveyData, null, 2);
+  const prompt = promptTemplate.replace("{{SURVEY_JSON}}", surveyJsonString);
 
   const response = await openai.chat.completions.create({
     model: "gpt-5-nano",
-    messages,
+    messages: [{ role: "system", content: prompt }],
   });
 
-  return response.choices[0].message.content.trim();
+  // Raw response from OpenAI
+  console.log("OpenAI raw response:");
+  console.dir(response, { depth: null });
+
+  const text = response.choices[0].message.content.trim();
+
+  // Text parsed from openai response
+  console.log("OpenAI returned text:");
+  console.log(text);
+
+  return JSON.parse(text);
 }
 
 module.exports = generateLocation;
