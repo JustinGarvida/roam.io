@@ -3,7 +3,7 @@ let router = express.Router();
 let { getCheapestFlightDates } = require("../utils/flights/flightList");
 
 // test with
-// curl "http://localhost:4000/api/flights/cheapest-dates?origin=MAD&destination=LON&viewBy=MONTH"
+// curl "http://localhost:4000/api/flights/cheapest-dates?origin=MAD&destination=NYC"
 
 router.get("/cheapest-dates", async (req, res) => {
   try {
