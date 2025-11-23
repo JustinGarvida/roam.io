@@ -1,33 +1,22 @@
+// src/components/NavBar.jsx
 import { Link, useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import React from "react";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Button,
+  NavDropdown,
+} from "react-bootstrap";
 import mainLogo from "../assets/main_logo.png";
-import { supabase } from "../services/auth";
+import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
-  let [user, setUser] = useState(null);
-  let navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    let fetchUser = async () => {
-      let { data } = await supabase.auth.getUser();
-      setUser(data.user);
-    };
-    fetchUser();
-
-    let { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-  let handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 
@@ -38,11 +27,7 @@ function NavBar() {
           <img
             src={mainLogo}
             alt="Logo"
-            style={{
-              height: "40px",
-              width: "auto",
-              objectFit: "contain",
-            }}
+            style={{ height: "40px", width: "auto", objectFit: "contain" }}
             className="me-2"
           />
         </Navbar.Brand>
@@ -50,34 +35,39 @@ function NavBar() {
         <Navbar.Toggle aria-controls="main-navbar" />
         <Navbar.Collapse id="main-navbar">
           <Nav className="ms-auto align-items-center">
+            {/* Always-visible links */}
+            <Nav.Link as={Link} to="/survey">Survey</Nav.Link>
+            <Nav.Link as={Link} to="/hotels">Hotels</Nav.Link>
+            <Nav.Link as={Link} to="/flights">Flights</Nav.Link>
+
+            {/* Auth-dependent section */}
             {!user ? (
-              <>
-                <Nav.Link as={Link} to="/hotels"></Nav.Link>
-                <Nav.Link as={Link} to="/login">
-                  Login
-                </Nav.Link>
-                <Button
-                  as={Link}
-                  to="/signup"
-                  variant="primary"
-                  className="ms-3"
-                >
-                  Sign Up
-                </Button>
-              </>
+              <Button
+                as={Link}
+                to="/login"
+                variant="primary"
+                className="ms-3"
+              >
+                Sign in / Create Account
+              </Button>
             ) : (
-              <>
-                <Nav.Link as={Link} to="/home">
-                  Dashboard
-                </Nav.Link>
-                <Button
-                  variant="outline-light"
-                  className="ms-3"
-                  onClick={handleLogout}
-                >
+              <NavDropdown
+                title={user.email}
+                id="user-dropdown"
+                align="end"
+                className="ms-3"
+              >
+                <NavDropdown.Item as={Link} to="/user">
+                  Account
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/plans">
+                  Plans
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item onClick={handleLogout}>
                   Sign Out
-                </Button>
-              </>
+                </NavDropdown.Item>
+              </NavDropdown>
             )}
           </Nav>
         </Navbar.Collapse>
