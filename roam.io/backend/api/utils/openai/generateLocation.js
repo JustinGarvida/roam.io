@@ -4,7 +4,7 @@ const openai = require("../openAiClient");
 
 async function generateLocation(surveyData) {
   const promptPath = path.join(__dirname, "prompt.txt");
-  let promptTemplate = await fs.readFile(promptPath, "utf8");
+  const promptTemplate = await fs.readFile(promptPath, "utf8");
 
   const surveyJsonString = JSON.stringify(surveyData, null, 2);
   const prompt = promptTemplate.replace("{{SURVEY_JSON}}", surveyJsonString);
@@ -14,17 +14,17 @@ async function generateLocation(surveyData) {
     messages: [{ role: "system", content: prompt }],
   });
 
-  // Raw response from OpenAI
-  console.log("OpenAI raw response:");
-  console.dir(response, { depth: null });
-
   const text = response.choices[0].message.content.trim();
+  const locationResult = JSON.parse(text);
 
-  // Text parsed from openai response
-  console.log("OpenAI returned text:");
-  console.log(text);
-
-  return JSON.parse(text);
+  return {
+    ...locationResult,
+    tripStartDate: surveyData.tripStartDate,
+    tripEndDate: surveyData.tripEndDate,
+    departureCity: surveyData.departureCity,
+    budget: surveyData.budget,
+    travelCompanions: surveyData.travelCompanions,
+  };
 }
 
 module.exports = generateLocation;
