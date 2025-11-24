@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+
+.question-stack .question-block {
+  padding: 20px 5px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.question-stack .question-block:last-child {
+  border-bottom: none;
+}
+
+.card {
+  background-color: #fff;
+}
+
+.question-bubble {
+  background: #ffffff;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.question-bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+

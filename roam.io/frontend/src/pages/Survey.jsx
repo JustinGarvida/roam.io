@@ -1,141 +1,256 @@
 import React, { useState } from "react";
-
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // 👈 NEW
+import InputQuestion from "../components/survey/InputQuestion";
+import MultiChoiceWithOtherQuestion from "../components/survey/MultiChoiceWithOtherQuestion";
+import DateQuestion from "../components/survey/DateQuestion";
+import { generateTripFromSurvey } from "../services/tripGenerator"
 
 function Survey() {
-  let [formData, setFormData] = useState({
-    name: "",
+  const [formData, setFormData] = useState({
     destinationType: "",
+    destinationTypeOther: "",
     budget: "",
     travelCompanions: "",
-    activities: "",
+    activities: [],
+    activitiesOther: "",
+    climatePreference: "",
+    travelVibe: "",
+    departureCity: "",
+    notes: "",
+    tripStartDate: null,
+    tripEndDate: null,
   });
 
-  let [message, setMessage] = useState("");
-  let [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  let handleChange = (e) => {
-    let { name, value } = e.target;
+  const setFieldValue = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-
-  let handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-
-      try {
-    let res = await fetch("http://localhost:4000/api/survey", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    let data = await res.json();
-    alert(data.message);
-  } catch (err) {
-    console.error(err);
-    alert("Error submitting survey");
-  }
-    setLoading(false);
   };
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setMessage("");
+
+  if (!formData.tripStartDate || !formData.tripEndDate) {
+    setMessage("Please select both a start and end date.");
+    setLoading(false);
+    return;
+  }
+
+  if (formData.tripEndDate < formData.tripStartDate) {
+    setMessage("End date must be on or after the start date.");
+    setLoading(false);
+    return;
+  }
+
+  const formatDate = (d) =>
+    d instanceof Date && !isNaN(d) ? d.toISOString().slice(0, 10) : null;
+
+  const finalData = {
+    destinationType:
+      formData.destinationType === "other"
+        ? formData.destinationTypeOther
+        : formData.destinationType,
+    budget: formData.budget,
+    travelCompanions: formData.travelCompanions,
+    activities: [
+      ...(formData.activities || []),
+      formData.activitiesOther
+        ? `Other: ${formData.activitiesOther}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(", "),
+    climatePreference: formData.climatePreference,
+    travelVibe: formData.travelVibe,
+    departureCity: formData.departureCity,
+    notes: formData.notes,
+    tripStartDate: formatDate(formData.tripStartDate),
+    tripEndDate: formatDate(formData.tripEndDate),
+  };
+
+  try {
+    console.log(finalData)
+    const { location, plans } = await generateTripFromSurvey(finalData);
+
+    navigate("/trip-plans", {
+      state: { location, plans, survey: finalData },
+    });
+  } catch (err) {
+    console.error(err);
+    setMessage("Error generating trip plan. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
-    <div className="d-flex align-items-center justify-content-center vh-100">
-      <div className="card shadow-lg p-4" style={{ width: "500px" }}>
+    <div className="d-flex align-items-center justify-content-center min-vh-100">
+      <div
+        className="card shadow-lg p-5"
+        style={{ width: "700px", borderRadius: "12px" }}
+      >
         <div className="text-center mb-4">
-          <h2 className="fw-bold text-primary">Vacation Survey</h2>
-          <p className="text-muted">Fill this out to plan you're vacation</p>
+          <h2 className="fw-bold text-primary">Find Your Perfect Getaway</h2>
+          <p className="text-muted">
+            Discover your next vacation by taking this survey!
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Your Name</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Name here"
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label fw-bold">Destination Type</label>
-            <select
+        <form onSubmit={handleSubmit} className="question-stack">
+          {/* Destination type */}
+          <div className="question-bubble">
+            <MultiChoiceWithOtherQuestion
+              label="Destination Type"
               name="destinationType"
-              className="form-select"
+              options={[
+                { value: "beach", label: "Beach" },
+                { value: "city", label: "City" },
+                { value: "mountains", label: "Mountains" },
+              ]}
               value={formData.destinationType}
-              onChange={handleChange}
+              otherName="destinationTypeOther"
+              otherValue={formData.destinationTypeOther}
+              multiple={false}
+              onChange={setFieldValue}
               required
-            >
-              <option value="">Select one...</option>
-              <option value="beach">Beach</option>
-              <option value="city">City</option>
-              <option value="mountain">Mountains</option>
-            </select>
+            />
           </div>
 
-          <div className="mb-3">
-            <label className="form-label fw-bold">Budget ($)</label>
-            <input
-              type="number"
+          {/* Budget */}
+          <div className="question-bubble">
+            <InputQuestion
+              label="Budget"
               name="budget"
-              className="form-control"
-              value={formData.budget}
-              onChange={handleChange}
-              placeholder="Example: 2000"
-              min="0"
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label fw-bold">Amount of People</label>
-            <input
               type="number"
-              name="travelCompanions"
-              className="form-control"
-              value={formData.travelCompanions}
-              onChange={handleChange}
-              min="1"
+              value={formData.budget}
+              onChange={setFieldValue}
+              placeholder="Enter your total budget (e.g. 2000)"
+              min={0}
               required
             />
           </div>
 
-          <div className="mb-3">
-            <label className="form-label fw-bold">Preferred Activities</label>
-            <textarea
-              name="activities"
-              className="form-control"
-              value={formData.activities}
-              onChange={handleChange}
-              placeholder="What do you want to do."
+          {/* Number of people */}
+          <div className="question-bubble">
+            <InputQuestion
+              label="Number of People"
+              name="travelCompanions"
+              type="number"
+              value={formData.travelCompanions}
+              onChange={setFieldValue}
+              placeholder="e.g. 2"
+              min={1}
               required
-            ></textarea>
+            />
+          </div>
+
+          {/* Trip dates (single question, range picker) */}
+          <div className="question-bubble">
+            <DateQuestion
+              label="When are you planning to travel?"
+              startName="tripStartDate"
+              endName="tripEndDate"
+              startValue={formData.tripStartDate}
+              endValue={formData.tripEndDate}
+              onChange={setFieldValue}
+            />
+          </div>
+
+          {/* Climate preference */}
+          <div className="question-bubble">
+            <MultiChoiceWithOtherQuestion
+              label="Preferred Climate"
+              name="climatePreference"
+              options={[
+                { value: "warm", label: "Warm & sunny" },
+                { value: "mild", label: "Mild / temperate" },
+                { value: "cold", label: "Cold / snowy" },
+                { value: "noPreference", label: "No strong preference" },
+              ]}
+              value={formData.climatePreference}
+              multiple={false}
+              onChange={setFieldValue}
+            />
+          </div>
+
+          <div className="question-bubble">
+            <MultiChoiceWithOtherQuestion
+              label="Trip Vibe"
+              name="travelVibe"
+              options={[
+                { value: "relax", label: "Relax & unwind" },
+                { value: "mixed", label: "Mix of relaxing & exploring" },
+                { value: "adventure", label: "Non-stop adventure" },
+              ]}
+              value={formData.travelVibe}
+              multiple={false}
+              onChange={setFieldValue}
+            />
+          </div>
+
+          <div className="question-bubble">
+            <InputQuestion
+              label="Departure City or Airport"
+              name="departureCity"
+              value={formData.departureCity}
+              onChange={setFieldValue}
+              placeholder="e.g. New York (JFK), Philadelphia, etc."
+              required
+            />
+          </div>
+
+          <div className="question-bubble">
+            <MultiChoiceWithOtherQuestion
+              label="Preferred Activities"
+              name="activities"
+              options={[
+                { value: "Relaxing on the beach", label: "Relaxing on the beach" },
+                { value: "Sightseeing & culture", label: "Sightseeing & culture" },
+                { value: "Outdoor adventures", label: "Outdoor adventures" },
+                {
+                  value: "Nightlife & entertainment",
+                  label: "Nightlife & entertainment",
+                },
+                { value: "Food & dining", label: "Food & dining" },
+              ]}
+              value={formData.activities}
+              otherName="activitiesOther"
+              otherValue={formData.activitiesOther}
+              multiple={true}
+              onChange={setFieldValue}
+            />
+          </div>
+
+          <div className="question-bubble">
+            <InputQuestion
+              label="Any must-haves or restrictions?"
+              name="notes"
+              as="textarea"
+              rows={3}
+              value={formData.notes}
+              onChange={setFieldValue}
+              placeholder="e.g. Kid-friendly, no long flights, avoid extreme heat, love street food, etc."
+            />
           </div>
 
           <button
             type="submit"
-            className="btn btn-primary w-100"
+            className="btn btn-primary w-100 mt-4"
             disabled={loading}
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? "Generating your trip..." : "Submit"}
           </button>
         </form>
 
         {message && (
-          <div className="alert alert-info text-center mt-3" role="alert">
+          <div className="alert alert-info text-center mt-4" role="alert">
             {message}
           </div>
         )}
-
-        <div className="text-center mt-3">
-          <small className="text-muted">
-          </small>
-        </div>
       </div>
     </div>
   );
