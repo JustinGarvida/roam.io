@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+let API_BASE = process.env.REACT_APP_API_BASE;
+
 function Flights() {
   let [flight, setFlight] = useState(null);
   let [loading, setLoading] = useState(false);
@@ -13,7 +15,7 @@ function Flights() {
     setError(null);
     try {
       let params = new URLSearchParams({ origin, destination });
-      let response = await fetch(`http://localhost:4000/api/flights/cheapest-dates?${params}`);
+      let response = await fetch(`${API_BASE}/api/flights/cheapest-dates?${params.toString()}`);
 
       let data = await response.json();
       if (!data.data) {
