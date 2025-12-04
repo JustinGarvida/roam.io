@@ -20,7 +20,6 @@ function PlansDashboard() {
   const [showAddForm, setShowAddForm] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  // Load user
   useEffect(() => {
     async function loadUser() {
       const { data } = await supabase.auth.getUser();
@@ -29,7 +28,6 @@ function PlansDashboard() {
     loadUser();
   }, []);
 
-  // Load existing plans
   useEffect(() => {
     if (!user) return;
     async function loadPlans() {
@@ -43,7 +41,6 @@ function PlansDashboard() {
     loadPlans();
   }, [user]);
 
-  // Handle input fields
   let handleChange = (e, section) => {
     let { name, value } = e.target;
 
@@ -68,7 +65,6 @@ function PlansDashboard() {
     }
   };
 
-  // SAVE / UPDATE plan to Supabase
   let savePlan = async () => {
     if (!user) return alert("You must be logged in.");
 
@@ -87,7 +83,6 @@ function PlansDashboard() {
     let data, error;
 
     if (showAddForm === "new") {
-      // Insert new plan
       const response = await supabase
         .from("plans")
         .insert([payload])
@@ -99,7 +94,6 @@ function PlansDashboard() {
 
       if (!error) setPlans([...plans, data]);
     } else {
-      // Update existing plan
       const response = await supabase
         .from("plans")
         .update(payload)
@@ -139,7 +133,6 @@ function PlansDashboard() {
         <div className="p-3 border bg-light mb-4">
           <h5>{showAddForm === "new" ? "New Plan" : "Edit Plan"}</h5>
 
-          {/* BASIC FIELDS */}
           <div className="row g-2 mb-2">
             <div className="col">
               <input
@@ -183,7 +176,6 @@ function PlansDashboard() {
             </div>
           </div>
 
-          {/* OUTBOUND */}
           <h6 className="mt-3">Outbound Flight</h6>
           <div className="row g-2 mb-2">
             <div className="col">
@@ -227,7 +219,6 @@ function PlansDashboard() {
             </div>
           </div>
 
-          {/* INBOUND */}
           <h6 className="mt-3">Return Flight</h6>
           <div className="row g-2 mb-2">
             <div className="col">
@@ -271,7 +262,6 @@ function PlansDashboard() {
             </div>
           </div>
 
-          {/* HOTEL */}
           <h6 className="mt-3">Hotel</h6>
           <div className="row g-2 mb-2">
             <div className="col">
@@ -306,7 +296,6 @@ function PlansDashboard() {
             </div>
           </div>
 
-          {/* PUBLIC TOGGLE */}
           <div className="form-check mt-3">
             <input
               type="checkbox"
@@ -328,7 +317,6 @@ function PlansDashboard() {
         </div>
       )}
 
-      {/* PLAN CARDS */}
       {plans.map((plan) => (
         <div key={plan.id} className="mb-4 p-3 border rounded">
           <h3>
@@ -343,7 +331,6 @@ function PlansDashboard() {
             <strong>Budget:</strong> {plan.budget}
           </p>
 
-          {/* Buttons */}
           <button
             className="btn btn-primary btn-sm me-2"
             onClick={() => toggleAddForm(plan.id)}
@@ -372,8 +359,7 @@ function PlansDashboard() {
           )}
         </div>
       ))}
-
-      {/* VIEW MODAL */}
+      
       {selectedPlan && (
         <div
           className="modal fade show d-block"
