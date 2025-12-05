@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 
 let API_BASE = process.env.REACT_APP_API_BASE;
+//let API_BASE = "http://localhost:4000"
 
 function Flights() {
-  let [flight, setFlight] = useState(null);
+  let [flights, setFlights] = useState([]);
   let [loading, setLoading] = useState(false);
   let [error, setError] = useState(null);
 
@@ -18,14 +19,16 @@ function Flights() {
       let response = await fetch(`${API_BASE}/api/flights/cheapest-dates?${params.toString()}`);
 
       let data = await response.json();
-      if (!data.data) {
+      if (!data.data || data.data.length === 0) {
         setError("No flight data found. Please try the following: MAD, LON, NYC, PAR, BCN");
+        setFlights([]);
       } else {
-        setFlight(data.data);
+        setFlights(data.data);
       }
     } catch (err) {
       console.error(err);
       setError("Failed to fetch flight data. Please try the following: MAD, LON, NYC, PAR, BCN");
+      setFlights([]);
     } finally {
       setLoading(false);
     }
@@ -68,8 +71,8 @@ function Flights() {
       {loading && <p>Loading cheapest flight...</p>}
       {error && <p class="text-danger">{error}</p>}
 
-      {flight && (
-        <div class="card mt-3">
+      {flights.length > 0 && flights.map((flight, index) => (
+        <div class="card mt-3" key={index}>
           <div class="card-body">
             <h5 class="card-title">Cheapest Flight</h5>
             <p class="card-text">
@@ -85,7 +88,7 @@ function Flights() {
             </p>
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }

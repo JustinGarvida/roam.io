@@ -62,7 +62,7 @@ async function getCheapestFlightDates({origin, destination, departureDate, oneWa
 
   allFlights.sort((a, b) => a.price - b.price);
   
-  return allFlights[0];
+  return allFlights.slice(0, 5);
 }
 
 module.exports = { getCheapestFlightDates };
