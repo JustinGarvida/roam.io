@@ -1,14 +1,6 @@
-// utils/generateTrips.js (or wherever you keep it)
-
 const { getCheapestHotelsByZip } = require("../hotels/hotelList");
 const { getCheapestFlightDates } = require("../flights/flightList");
 
-/**
- * Generate up to `numOptions` combined hotel + flight trip packages
- * based on a ZIP code for hotels.
- *
- * NOTE: Flight `links` are removed from the returned payload.
- */
 async function generateTrips({
   origin,
   destination,
@@ -31,7 +23,6 @@ async function generateTrips({
 
   numOptions = 5,
 }) {
-
   if (!zipCode) {
     throw new Error("zipCode is required");
   }
@@ -58,8 +49,9 @@ async function generateTrips({
   }
 
   hotels.sort((a, b) => a.totalPrice - b.totalPrice);
+  const selectedHotels = hotels.slice(0, numOptions);
 
-  const cheapestFlightRaw = await getCheapestFlightDates({
+  const flights = await getCheapestFlightDates({
     origin,
     destination,
     departureDate: checkInDate,
@@ -70,35 +62,52 @@ async function generateTrips({
     viewBy,
   });
 
-  if (!cheapestFlightRaw || !cheapestFlightRaw.price) {
+  if (!flights || flights.length === 0) {
     return [];
   }
 
-  const { links, ...cheapestFlight } = cheapestFlightRaw;
+  const validFlights = flights.filter(
+    (f) => f && f.price != null && !Number.isNaN(Number(f.price))
+  );
 
-  const selectedHotels = hotels.slice(0, numOptions);
+  if (validFlights.length === 0) {
+    return [];
+  }
 
-  const trips = selectedHotels.map((hotel) => {
+  let trips = [];
+
+  for (const hotel of selectedHotels) {
     const hotelPrice = Number(hotel.totalPrice || 0);
-    const flightPrice = Number(cheapestFlight.price || 0);
 
-    return {
-      destination: hotel.city || destination,
-      checkInDate: hotel.checkInDate || checkInDate,
-      checkOutDate: hotel.checkOutDate || checkOutDate,
+    for (const flight of validFlights) {
+      const flightPrice = Number(flight.price || 0);
+      const totalPrice = hotelPrice + flightPrice;
 
-      hotel,
-      flight: cheapestFlight, 
+      trips.push({
+        destination: hotel.city || destination,
+        checkInDate: hotel.checkInDate || checkInDate,
+        checkOutDate: hotel.checkOutDate || checkOutDate,
+        hotel,
+        flight,
+        currency: currencyCode,
+        totalTripPrice: totalPrice,
+      });
+    } 
+  }
 
-      currency: currencyCode,
-      totalTripPrice: hotelPrice + flightPrice,
-    };
-  });
+  if (maxPrice) {
+    const numericMax = Number(maxPrice);
+    trips = trips.filter((trip) => trip.totalTripPrice <= numericMax);
+
+    if (trips.length === 0) {
+      return [];
+    }
+  }
 
   trips.sort((a, b) => a.totalTripPrice - b.totalTripPrice);
+
   return trips.slice(0, numOptions);
 }
 
-module.exports = {
-  generateTrips,
-};
+module.exports = { generateTrips };
+         

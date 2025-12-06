@@ -1,8 +1,23 @@
 const fs = require("fs/promises");
 const path = require("path");
 const openai = require("../openAiClient");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+
+function isTestingMode() {
+  return String(process.env.TESTING).toLowerCase() === "true";
+}
 
 async function generateLocation(surveyData) {
+  if (isTestingMode()) {
+    console.log(
+      "TESTING mode enabled in generateLocation. Returning NYC stub."
+    );
+    return {
+      location: "NYC",
+      zipcode: "10001",
+    };
+  }
+
   const promptPath = path.join(__dirname, "prompt.txt");
   const promptTemplate = await fs.readFile(promptPath, "utf8");
 

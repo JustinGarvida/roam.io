@@ -1,9 +1,10 @@
+// src/pages/Survey.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 👈 NEW
+import { useNavigate } from "react-router-dom";
 import InputQuestion from "../components/survey/InputQuestion";
 import MultiChoiceWithOtherQuestion from "../components/survey/MultiChoiceWithOtherQuestion";
 import DateQuestion from "../components/survey/DateQuestion";
-import { generateTripFromSurvey } from "../services/tripGenerator"
+import { generateTripFromSurvey } from "../services/tripGenerator";
 
 function Survey() {
   const [formData, setFormData] = useState({
@@ -29,63 +30,69 @@ function Survey() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setMessage("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
-  if (!formData.tripStartDate || !formData.tripEndDate) {
-    setMessage("Please select both a start and end date.");
-    setLoading(false);
-    return;
-  }
+    // date validation
+    if (!formData.tripStartDate || !formData.tripEndDate) {
+      setMessage("Please select both a start and end date.");
+      setLoading(false);
+      return;
+    }
 
-  if (formData.tripEndDate < formData.tripStartDate) {
-    setMessage("End date must be on or after the start date.");
-    setLoading(false);
-    return;
-  }
+    if (formData.tripEndDate < formData.tripStartDate) {
+      setMessage("End date must be on or after the start date.");
+      setLoading(false);
+      return;
+    }
 
-  const formatDate = (d) =>
-    d instanceof Date && !isNaN(d) ? d.toISOString().slice(0, 10) : null;
+    const formatDate = (d) =>
+      d instanceof Date && !isNaN(d) ? d.toISOString().slice(0, 10) : null;
 
-  const finalData = {
-    destinationType:
-      formData.destinationType === "other"
-        ? formData.destinationTypeOther
-        : formData.destinationType,
-    budget: formData.budget,
-    travelCompanions: formData.travelCompanions,
-    activities: [
-      ...(formData.activities || []),
-      formData.activitiesOther
-        ? `Other: ${formData.activitiesOther}`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(", "),
-    climatePreference: formData.climatePreference,
-    travelVibe: formData.travelVibe,
-    departureCity: formData.departureCity,
-    notes: formData.notes,
-    tripStartDate: formatDate(formData.tripStartDate),
-    tripEndDate: formatDate(formData.tripEndDate),
+    const finalData = {
+      destinationType:
+        formData.destinationType === "other"
+          ? formData.destinationTypeOther
+          : formData.destinationType,
+      budget: Number(formData.budget),
+      travelCompanions: Number(formData.travelCompanions),
+      activities: [
+        ...(formData.activities || []),
+        formData.activitiesOther ? `Other: ${formData.activitiesOther}` : null,
+      ]
+        .filter(Boolean)
+        .join(", "),
+      climatePreference: formData.climatePreference,
+      travelVibe: formData.travelVibe,
+      departureCity: formData.departureCity,
+      notes: formData.notes,
+      tripStartDate: formatDate(formData.tripStartDate),
+      tripEndDate: formatDate(formData.tripEndDate),
+    };
+
+    try {
+      console.log("Submitting survey:", finalData);
+
+      // Call backend to generate location + plans
+      const { location, plans } = await generateTripFromSurvey(finalData);
+
+      // Redirect to GeneratedPlans page with the data
+      navigate("/generated-plans", {
+        state: {
+          location,
+          plans,
+          survey: finalData,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      setMessage("Error generating trip plan. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  try {
-    console.log(finalData)
-    const { location, plans } = await generateTripFromSurvey(finalData);
-
-    navigate("/trip-plans", {
-      state: { location, plans, survey: finalData },
-    });
-  } catch (err) {
-    console.error(err);
-    setMessage("Error generating trip plan. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
 
   return (
     <div className="d-flex align-items-center justify-content-center min-vh-100">
@@ -148,7 +155,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
-          {/* Trip dates (single question, range picker) */}
+          {/* Trip dates */}
           <div className="question-bubble">
             <DateQuestion
               label="When are you planning to travel?"
@@ -177,6 +184,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Trip vibe */}
           <div className="question-bubble">
             <MultiChoiceWithOtherQuestion
               label="Trip Vibe"
@@ -192,6 +200,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Departure city */}
           <div className="question-bubble">
             <InputQuestion
               label="Departure City or Airport"
@@ -203,6 +212,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Activities */}
           <div className="question-bubble">
             <MultiChoiceWithOtherQuestion
               label="Preferred Activities"
@@ -225,6 +235,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Notes */}
           <div className="question-bubble">
             <InputQuestion
               label="Any must-haves or restrictions?"
