@@ -8,6 +8,7 @@ import Hotels from "./pages/Hotels";
 import User from "./pages/User";
 import Flights from "./pages/Flights";
 import TripPlans from "./pages/TripPlans";
+import GeneratedPlans from "./pages/GeneratedPlans";
 
 export default function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ export default function AppRoutes() {
       <Route path="/user" element={<User />} />
       <Route path="/flights" element={<Flights />} />
       <Route path="/trip-plans" element={<TripPlans />} />
+      <Route path='/generated-plans' element={<GeneratedPlans/>} />
     </Routes>
   );
 }
