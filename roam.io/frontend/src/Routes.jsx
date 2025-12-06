@@ -10,6 +10,8 @@ import Flights from "./pages/Flights";
 import TripPlans from "./pages/TripPlans";
 import GeneratedPlans from "./pages/GeneratedPlans";
 import PublicPlan from "./pages/PublicPlan";
+import PublicPlan from "./pages/PublicPlan";
+
 
 export default function AppRoutes() {
   return (
@@ -25,6 +27,7 @@ export default function AppRoutes() {
       <Route path="/trip-plans" element={<TripPlans />} />
       <Route path="/plan/:id" element={<PublicPlan />} />
       <Route path="/generated-plans" element={<GeneratedPlans />} />
+
     </Routes>
   );
 }
