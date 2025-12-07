@@ -8,6 +8,7 @@ import Hotels from "./pages/Hotels";
 import User from "./pages/User";
 import Flights from "./pages/Flights";
 import TripPlans from "./pages/TripPlans";
+import GeneratedPlans from "./pages/GeneratedPlans";
 import PublicPlan from "./pages/PublicPlan";
 import Calendar from "./pages/Calendar";
 

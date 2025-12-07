@@ -47,10 +47,12 @@ app.post("/api/signup", (req, res) => {
 const hotelRoutes = require("./routes/hotels");
 const flightRoutes = require("./routes/flights");
 const locationRoutes = require("./routes/location");
+const planRoutes = require("./routes/plans")
 
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/flights", flightRoutes);
 app.use("/api/location", locationRoutes)
+app.use("/api/plans", planRoutes);
 
 let PORT = process.env.PORT || 4000;
 
