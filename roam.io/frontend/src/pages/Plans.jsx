@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../services/auth";
+import { useNavigate } from "react-router-dom";
 
 function PlansDashboard() {
   const [plans, setPlans] = useState([]);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   let emptyForm = {
     name: "",
@@ -11,8 +13,8 @@ function PlansDashboard() {
     to: "",
     budget: "",
     is_public: false,
-    outbound: { airline: "", time: "", airport: "", cost: "" },
-    inbound: { airline: "", time: "", airport: "", cost: "" },
+    outbound: { airline: "", date: "", time: "", airport: "", cost: "" },
+    inbound: { airline: "", date: "", time: "", airport: "", cost: "" },
     hotel: { name: "", nights: "", totalCost: "" },
   };
 
@@ -44,7 +46,11 @@ function PlansDashboard() {
   let handleChange = (e, section) => {
     let { name, value } = e.target;
 
-    if (section === "outbound" || section === "inbound" || section === "hotel") {
+    if (
+      section === "outbound" ||
+      section === "inbound" ||
+      section === "hotel"
+    ) {
       setFormData({
         ...formData,
         [section]: { ...formData[section], [name]: value },
@@ -125,8 +131,18 @@ function PlansDashboard() {
     <div className="container py-5">
       <h1 className="mb-4 text-primary">Travel Plans</h1>
 
-      <button className="btn btn-success mb-4" onClick={() => toggleAddForm("new")}>
+      <button
+        className="btn btn-success mb-4"
+        onClick={() => toggleAddForm("new")}
+      >
         Add New Plan
+      </button>
+
+      <button
+        className="btn btn-success mb-4 pd-2 ms-3"
+        onClick={() => navigate("/calendar")}
+      >
+        View Calendar
       </button>
 
       {showAddForm && (
@@ -190,6 +206,15 @@ function PlansDashboard() {
             </div>
             <div className="col">
               <input
+                type="date"
+                name="date"
+                className="form-control"
+                value={formData.outbound.date || ""}
+                onChange={(e) => handleChange(e, "outbound")}
+              />
+            </div>
+            <div className="col">
+              <input
                 type="time"
                 name="time"
                 className="form-control"
@@ -228,6 +253,15 @@ function PlansDashboard() {
                 placeholder="Airline"
                 className="form-control"
                 value={formData.inbound.airline}
+                onChange={(e) => handleChange(e, "inbound")}
+              />
+            </div>
+            <div className="col">
+              <input
+                type="date"
+                name="date"
+                className="form-control"
+                value={formData.inbound.date || ""}
                 onChange={(e) => handleChange(e, "inbound")}
               />
             </div>
@@ -321,14 +355,12 @@ function PlansDashboard() {
         <div key={plan.id} className="mb-4 p-3 border rounded">
           <h3>
             {plan.name}{" "}
-            {plan.is_public && (
-              <span className="badge bg-success">Public</span>
-            )}
+            {plan.is_public && <span className="badge bg-success">Public</span>}
           </h3>
 
           <p>
-            <strong>From:</strong> {plan.from} | <strong>To:</strong> {plan.to} |{" "}
-            <strong>Budget:</strong> {plan.budget}
+            <strong>From:</strong> {plan.from} | <strong>To:</strong> {plan.to}{" "}
+            | <strong>Budget:</strong> {plan.budget}
           </p>
 
           <button
@@ -359,7 +391,7 @@ function PlansDashboard() {
           )}
         </div>
       ))}
-      
+
       {selectedPlan && (
         <div
           className="modal fade show d-block"
@@ -369,27 +401,34 @@ function PlansDashboard() {
             <div className="modal-content">
               <div className="modal-header bg-primary text-white">
                 <h5 className="modal-title">{selectedPlan.name} Details</h5>
-                <button className="btn-close btn-close-white" onClick={closePopup}></button>
+                <button
+                  className="btn-close btn-close-white"
+                  onClick={closePopup}
+                ></button>
               </div>
 
               <div className="modal-body">
-                <p><strong>From:</strong> {selectedPlan.from}</p>
-                <p><strong>To:</strong> {selectedPlan.to}</p>
-                <p><strong>Budget:</strong> {selectedPlan.budget}</p>
+                <p>
+                  <strong>From:</strong> {selectedPlan.from}
+                </p>
+                <p>
+                  <strong>To:</strong> {selectedPlan.to}
+                </p>
+                <p>
+                  <strong>Budget:</strong> {selectedPlan.budget}
+                </p>
 
                 <hr />
 
                 <p>
                   <strong>Outbound:</strong> {selectedPlan.outbound.airline},{" "}
-                  {selectedPlan.outbound.time},{" "}
-                  {selectedPlan.outbound.airport},{" "}
+                  {selectedPlan.outbound.time}, {selectedPlan.outbound.airport},{" "}
                   {selectedPlan.outbound.cost}
                 </p>
 
                 <p>
                   <strong>Inbound:</strong> {selectedPlan.inbound.airline},{" "}
-                  {selectedPlan.inbound.time},{" "}
-                  {selectedPlan.inbound.airport},{" "}
+                  {selectedPlan.inbound.time}, {selectedPlan.inbound.airport},{" "}
                   {selectedPlan.inbound.cost}
                 </p>
 
