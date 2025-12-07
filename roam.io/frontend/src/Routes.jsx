@@ -10,7 +10,6 @@ import Flights from "./pages/Flights";
 import TripPlans from "./pages/TripPlans";
 import GeneratedPlans from "./pages/GeneratedPlans";
 import PublicPlan from "./pages/PublicPlan";
-import PublicPlan from "./pages/PublicPlan";
 
 
 export default function AppRoutes() {
