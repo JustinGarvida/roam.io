@@ -4,35 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   let navigate = useNavigate();
-  let trips = [
-    {
-      id: 1,
-      destination: "Paris",
-      startDate: "12-10-2025",
-      endDate: "12-31-2025",
-      flights: ["Flight to Paris", "Returning Flight"],
-      hotels: ["Paris Hotel"],
-      attractions: ["Eiffel Tower"],
-    },
-    {
-      id: 2,
-      destination: "Beijing",
-      startDate: "3-15-2026",
-      endDate: "3-29-2026",
-      flights: ["Flight to Beijing", "Returning Flight"],
-      hotels: ["Beijing Hotel"],
-      attractions: ["Great Wall of China"],
-    },
-    {
-      id: 3,
-      destination: "Tokyo",
-      startDate: "6-18-2026",
-      endDate: "6-30-2026",
-      flights: ["Flight to Tokyo", "Returning Flight"],
-      hotels: ["Tokyo Hotel"],
-      attractions: ["Tokyo Tower"],
-    }
-  ];
 
   return (
     <div>
@@ -109,31 +80,10 @@ function Home() {
           </div>
           <div class="col-3">
             <div class="card border-0 shadow p-4 h-100">
-              <h5 class="fw-bold">3. Take a Quick Survey</h5>
-              <p>View, save, and edit your planned trips with ease.</p>
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="card border-0 shadow p-4 h-100">
-              <h5 class="fw-bold">4. Share and Sync</h5>
+              <h5 class="fw-bold">3. Share and Sync</h5>
               <p>Export your trip to a calendar to share with others.</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section class="py-5 text-center">
-        <div>
-          <h2 class="fw-bold mb-4">Current Trip Plans</h2>
-        </div>
-        <div>
-          {trips.map((trip) => (
-            <p key={trip.id}>
-              <span class="mx-2">Destination: {trip.destination}</span>
-              <span>Start Date: {trip.startDate}</span>
-              <span class="mx-2">End Date: {trip.endDate}</span>
-            </p>
-          ))}
         </div>
       </section>
 

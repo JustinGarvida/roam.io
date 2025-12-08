@@ -1,5 +1,5 @@
-// const BASE_URL = process.env.REACT_APP_API_BASE;
-const BASE_URL = "http://localhost:4000";
+const BASE_URL = process.env.REACT_APP_API_BASE;
+// const BASE_URL = "http://localhost:4000";
 
 export async function generateTripFromSurvey(finalData) {
   console.log("Starting generateTripFromSurvey");
