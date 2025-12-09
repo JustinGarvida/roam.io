@@ -1,4 +1,3 @@
-// src/pages/Survey.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputQuestion from "../components/survey/InputQuestion";
@@ -101,7 +100,7 @@ function Survey() {
         style={{ width: "700px", borderRadius: "12px" }}
       >
         <div className="text-center mb-4">
-          <h2 className="fw-bold text-primary">Find Your Perfect Getaway</h2>
+          <h2 className="fw-bold text-dark">Find Your Perfect Getaway</h2>
           <p className="text-muted">
             Discover your next vacation by taking this survey!
           </p>

@@ -1,49 +1,91 @@
-// src/pages/Hotels.jsx
 import React, { useState } from "react";
 import HotelCard from "../components/hotels/HotelCard";
 import HotelModal from "../components/hotels/HotelModal";
 
-
-const API_BASE = process.env.REACT_APP_API_BASE
-// const API_BASE = "https://roam-io-backend.vercel.app";
-console.log(API_BASE)
-const PAGE_SIZE = 20; 
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 function Hotels() {
   const [location, setLocation] = useState("");
   const [miles, setMiles] = useState("10");
+  const [checkInDate, setCheckInDate] = useState("");
+  const [checkOutDate, setCheckOutDate] = useState("");
+  const [budget, setBudget] = useState("");
+  const [adults, setAdults] = useState("2");
+  const [rooms, setRooms] = useState("1");
+
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-
   const [selectedHotel, setSelectedHotel] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const canSearch =
+    location.trim() !== "" &&
+    checkInDate.trim() !== "" &&
+    checkOutDate.trim() !== "" &&
+    adults.trim() !== "" &&
+    rooms.trim() !== "" &&
+    !(checkOutDate && checkInDate && checkOutDate < checkInDate);
+
+  const handleCheckInChange = (e) => {
+    const value = e.target.value;
+    setCheckInDate(value);
+    if (checkOutDate && checkOutDate < value) setCheckOutDate("");
+  };
+
+  const handleCheckOutChange = (e) => {
+    const value = e.target.value;
+    if (checkInDate && value < checkInDate) {
+      setError("Check-out date cannot be before check-in date.");
+      setCheckOutDate("");
+      return;
+    }
+    setError("");
+    setCheckOutDate(value);
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    if (!canSearch) return;
 
     setHasSearched(true);
-    setError("");
     setLoading(true);
+    setError("");
     setHotels([]);
 
     try {
       const params = new URLSearchParams();
-      if (location.trim()) params.append("location", location.trim());
-      if (miles) params.append("miles", miles);
 
-      const resp = await fetch(`${API_BASE}/api/hotels?${params.toString()}`);
-
-      if (!resp.ok) {
-        throw new Error(`Request failed with status ${resp.status}`);
+      const trimmedLocation = location.trim();
+      if (/^\d{5}$/.test(trimmedLocation)) {
+        params.append("zipCode", trimmedLocation);
+      } else {
+        params.append("location", trimmedLocation);
       }
 
-      const data = await resp.json();
+      params.append("miles", miles);
+      params.append("checkInDate", checkInDate);
+      params.append("checkOutDate", checkOutDate);
+      params.append("adults", adults);
+      params.append("roomQuantity", rooms);
 
-      const hotelsArray = Array.isArray(data.results) ? data.results : [];
+      const resp = await fetch(
+        `${API_BASE}/api/hotels/cheapest?${params.toString()}`
+      );
+      if (!resp.ok) throw new Error(`Request failed with status ${resp.status}`);
+
+      const data = await resp.json();
+      let hotelsArray = Array.isArray(data.results) ? data.results : [];
+
+      if (budget) {
+        const budgetNum = Number(budget);
+        hotelsArray = hotelsArray.filter((h) => {
+          const price = Number(h.totalPrice);
+          return Number.isNaN(price) || price <= budgetNum;
+        });
+      }
+
       setHotels(hotelsArray);
-      setCurrentPage(1);
     } catch (err) {
       console.error(err);
       setError("Something went wrong while fetching hotels.");
@@ -52,121 +94,147 @@ function Hotels() {
     }
   };
 
-  const handleCardClick = (hotel) => {
-    setSelectedHotel(hotel);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedHotel(null);
-  };
-
-  const totalPages = Math.ceil(hotels.length / PAGE_SIZE) || 1;
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const visibleHotels = hotels.slice(startIndex, startIndex + PAGE_SIZE);
-
-  const goToPage = (page) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
-
   return (
     <div className="container py-4">
-      <h1 className="mb-4">Search Hotels</h1>
+      {/* HEADER */}
+      <div className="text-center mb-4">
+        <h1 className="fw-bold">Find the Best Hotel Deals</h1>
+        <p className="text-muted fs-6">
+          Compare prices across thousands of hotels based on your travel dates
+          and preferences.
+        </p>
+      </div>
 
-      <form className="row g-3 mb-4" onSubmit={handleSearch}>
-        <div className="col-md-5">
-          <label className="form-label">City or ZIP</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="e.g. Philadelphia or 19104"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-        </div>
+      {/* FILTERS (RESPONSIVE GRID, NO BOX) */}
+      <div className="mx-auto mb-4" style={{ maxWidth: "1100px" }}>
+        <form
+          className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 align-items-end"
+          onSubmit={handleSearch}
+        >
+          <div className="col">
+            <label className="form-label">City or ZIP *</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="e.g. Philadelphia or 19104"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </div>
 
-        <div className="col-md-3">
-          <label className="form-label">Radius (miles)</label>
-          <input
-            type="number"
-            min="1"
-            className="form-control"
-            value={miles}
-            onChange={(e) => setMiles(e.target.value)}
-          />
-        </div>
+          <div className="col">
+            <label className="form-label">Radius (miles)</label>
+            <input
+              type="number"
+              min="1"
+              className="form-control"
+              value={miles}
+              onChange={(e) => setMiles(e.target.value)}
+            />
+          </div>
 
-        <div className="col-md-2 d-flex align-items-end">
-          <button
-            type="submit"
-            className="btn btn-dark w-100"
-            disabled={loading}
-          >
-            {loading ? "Searching..." : "Search"}
-          </button>
-        </div>
-      </form>
+          <div className="col">
+            <label className="form-label">Check-in *</label>
+            <input
+              type="date"
+              className="form-control"
+              value={checkInDate}
+              onChange={handleCheckInChange}
+            />
+          </div>
 
-      {error && (
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
-      )}
+          <div className="col">
+            <label className="form-label">Check-out *</label>
+            <input
+              type="date"
+              className="form-control"
+              value={checkOutDate}
+              min={checkInDate}
+              onChange={handleCheckOutChange}
+            />
+          </div>
+
+          <div className="col">
+            <label className="form-label">Guests *</label>
+            <input
+              type="number"
+              min="1"
+              className="form-control"
+              value={adults}
+              onChange={(e) => setAdults(e.target.value)}
+            />
+          </div>
+
+          <div className="col">
+            <label className="form-label">Rooms *</label>
+            <input
+              type="number"
+              min="1"
+              className="form-control"
+              value={rooms}
+              onChange={(e) => setRooms(e.target.value)}
+            />
+          </div>
+
+          <div className="col">
+            <label className="form-label">Max Budget (optional)</label>
+            <input
+              type="number"
+              min="0"
+              className="form-control"
+              placeholder="e.g. 500"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+            />
+          </div>
+
+          <div className="col d-flex">
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={!canSearch || loading}
+            >
+              {loading ? "Searching..." : "Search"}
+            </button>
+          </div>
+        </form>
+
+        {!canSearch && (
+          <p className="text-danger small mt-2">
+            * Please fill in all required fields.
+          </p>
+        )}
+      </div>
+
+      {/* RESULTS */}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       {!loading && hasSearched && hotels.length === 0 && !error && (
-        <p className="text-muted fst-italic">No hotels found.</p>
+        <p className="text-muted fst-italic text-center">
+          No hotels found for your criteria.
+        </p>
       )}
 
-      {/* Results */}
+      {/* ONE HOTEL PER ROW */}
       <div className="row">
-        {visibleHotels.map((hotel) => (
+        {hotels.map((hotel) => (
           <div
-            className="col-sm-6 col-md-4 col-lg-3 mb-3"
+            className="col-12 mb-3"
             key={
               hotel.hotelId ||
-              `${hotel.name}-${hotel.latitude}-${hotel.longitude}`
+              `${hotel.name}-${hotel.checkInDate}-${hotel.checkOutDate}`
             }
           >
-            <HotelCard hotel={hotel} onClick={handleCardClick} />
+            <HotelCard hotel={hotel} onClick={() => setSelectedHotel(hotel)} />
           </div>
         ))}
       </div>
 
-      {hotels.length > PAGE_SIZE && (
-        <nav aria-label="Hotel pagination">
-          <ul className="pagination justify-content-center mt-3">
-            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-              <button className="page-link" onClick={() => goToPage(currentPage - 1)}>
-                Previous
-              </button>
-            </li>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <li
-                key={page}
-                className={`page-item ${page === currentPage ? "active" : ""}`}
-              >
-                <button className="page-link" onClick={() => goToPage(page)}>
-                  {page}
-                </button>
-              </li>
-            ))}
-
-            <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
-            >
-              <button className="page-link" onClick={() => goToPage(currentPage + 1)}>
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav>
-      )}
-
       {selectedHotel && (
-        <HotelModal hotel={selectedHotel} onClose={handleCloseModal} />
+        <HotelModal
+          hotel={selectedHotel}
+          onClose={() => setSelectedHotel(null)}
+        />
       )}
     </div>
   );

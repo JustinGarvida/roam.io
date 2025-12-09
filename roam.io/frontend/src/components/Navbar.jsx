@@ -60,10 +60,17 @@ function NavBar() {
                 <NavDropdown.Item as={Link} to="/user">
                   Account
                 </NavDropdown.Item>
+
                 <NavDropdown.Item as={Link} to="/plans">
-                  Plans
+                  My Plans
                 </NavDropdown.Item>
+
+                <NavDropdown.Item as={Link} to="/calendar">
+                  My Calendar
+                </NavDropdown.Item>
+
                 <NavDropdown.Divider />
+
                 <NavDropdown.Item onClick={handleLogout}>
                   Sign Out
                 </NavDropdown.Item>

@@ -7,7 +7,7 @@ function PlansDashboard() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  let emptyForm = {
+  const emptyForm = {
     name: "",
     from: "",
     to: "",
@@ -29,28 +29,24 @@ function PlansDashboard() {
     }
     loadUser();
   }, []);
-
   useEffect(() => {
     if (!user) return;
     async function loadPlans() {
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from("plans")
         .select("*")
         .eq("user_id", user.id);
 
       if (!error) setPlans(data);
     }
+
     loadPlans();
   }, [user]);
 
-  let handleChange = (e, section) => {
-    let { name, value } = e.target;
+  const handleChange = (e, section) => {
+    const { name, value } = e.target;
 
-    if (
-      section === "outbound" ||
-      section === "inbound" ||
-      section === "hotel"
-    ) {
+    if (["outbound", "inbound", "hotel"].includes(section)) {
       setFormData({
         ...formData,
         [section]: { ...formData[section], [name]: value },
@@ -60,18 +56,18 @@ function PlansDashboard() {
     }
   };
 
-  let toggleAddForm = (planId = "new") => {
+  const toggleAddForm = (planId = "new") => {
     if (planId === "new") {
-      setShowAddForm("new");
       setFormData(emptyForm);
+      setShowAddForm("new");
     } else {
-      let planToEdit = plans.find((p) => p.id === planId);
+      const planToEdit = plans.find((p) => p.id === planId);
       setFormData(planToEdit);
       setShowAddForm(planId);
     }
   };
 
-  let savePlan = async () => {
+  const savePlan = async () => {
     if (!user) return alert("You must be logged in.");
 
     const payload = {
@@ -89,26 +85,20 @@ function PlansDashboard() {
     let data, error;
 
     if (showAddForm === "new") {
-      const response = await supabase
-        .from("plans")
-        .insert([payload])
-        .select()
-        .single();
-
-      data = response.data;
-      error = response.error;
-
+      const res = await supabase.from("plans").insert([payload]).select().single();
+      data = res.data;
+      error = res.error;
       if (!error) setPlans([...plans, data]);
     } else {
-      const response = await supabase
+      const res = await supabase
         .from("plans")
         .update(payload)
         .eq("id", showAddForm)
         .select()
         .single();
 
-      data = response.data;
-      error = response.error;
+      data = res.data;
+      error = res.error;
 
       if (!error) {
         setPlans(plans.map((p) => (p.id === showAddForm ? data : p)));
@@ -124,33 +114,34 @@ function PlansDashboard() {
     setFormData(emptyForm);
   };
 
-  let handleViewPlan = (plan) => setSelectedPlan(plan);
-  let closePopup = () => setSelectedPlan(null);
+  const handleViewPlan = (plan) => setSelectedPlan(plan);
+  const closePopup = () => setSelectedPlan(null);
 
   return (
     <div className="container py-5">
-      <h1 className="mb-4 text-primary">Travel Plans</h1>
 
-      <button
-        className="btn btn-success mb-4"
-        onClick={() => toggleAddForm("new")}
-      >
-        Add New Plan
-      </button>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="fw-bold text-dark">My Plans</h1>
 
-      <button
-        className="btn btn-success mb-4 pd-2 ms-3"
-        onClick={() => navigate("/calendar")}
-      >
-        View Calendar
-      </button>
+        <div>
+          <button className="btn btn-primary me-2" onClick={() => toggleAddForm("new")}>
+          Add New Plan
+          </button>
+
+          <button className="btn btn-primary" onClick={() => navigate("/calendar")}>
+            My Calendar
+          </button>
+        </div>
+      </div>
 
       {showAddForm && (
-        <div className="p-3 border bg-light mb-4">
-          <h5>{showAddForm === "new" ? "New Plan" : "Edit Plan"}</h5>
+        <div className="p-4 mb-4 bg-light rounded shadow-sm border">
+          <h4 className="fw-bold text-dark mb-3">
+            {showAddForm === "new" ? "Create New Plan" : "Edit Plan"}
+          </h4>
 
-          <div className="row g-2 mb-2">
-            <div className="col">
+          <div className="row g-3">
+            <div className="col-md-3">
               <input
                 type="text"
                 name="name"
@@ -160,7 +151,8 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e)}
               />
             </div>
-            <div className="col">
+
+            <div className="col-md-3">
               <input
                 type="text"
                 name="from"
@@ -170,7 +162,8 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e)}
               />
             </div>
-            <div className="col">
+
+            <div className="col-md-3">
               <input
                 type="text"
                 name="to"
@@ -180,7 +173,8 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e)}
               />
             </div>
-            <div className="col">
+
+            <div className="col-md-3">
               <input
                 type="number"
                 name="budget"
@@ -192,19 +186,22 @@ function PlansDashboard() {
             </div>
           </div>
 
-          <h6 className="mt-3">Outbound Flight</h6>
-          <div className="row g-2 mb-2">
-            <div className="col">
-              <input
-                type="text"
-                name="airline"
-                placeholder="Airline"
-                className="form-control"
-                value={formData.outbound.airline}
-                onChange={(e) => handleChange(e, "outbound")}
-              />
-            </div>
-            <div className="col">
+          {/* Outbound */}
+          <h5 className="mt-4 text-dark">Outbound Flight</h5>
+          <div className="row g-3">
+            {["airline", "airport", "cost"].map((f) => (
+              <div key={f} className="col-md-3">
+                <input
+                  type={f === "cost" ? "number" : "text"}
+                  name={f}
+                  placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
+                  className="form-control"
+                  value={formData.outbound[f] || ""}
+                  onChange={(e) => handleChange(e, "outbound")}
+                />
+              </div>
+            ))}
+            <div className="col-md-3">
               <input
                 type="date"
                 name="date"
@@ -213,7 +210,7 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e, "outbound")}
               />
             </div>
-            <div className="col">
+            <div className="col-md-3">
               <input
                 type="time"
                 name="time"
@@ -222,41 +219,23 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e, "outbound")}
               />
             </div>
-            <div className="col">
-              <input
-                type="text"
-                name="airport"
-                placeholder="Airport"
-                className="form-control"
-                value={formData.outbound.airport}
-                onChange={(e) => handleChange(e, "outbound")}
-              />
-            </div>
-            <div className="col">
-              <input
-                type="number"
-                name="cost"
-                placeholder="Cost"
-                className="form-control"
-                value={formData.outbound.cost}
-                onChange={(e) => handleChange(e, "outbound")}
-              />
-            </div>
           </div>
 
-          <h6 className="mt-3">Return Flight</h6>
-          <div className="row g-2 mb-2">
-            <div className="col">
-              <input
-                type="text"
-                name="airline"
-                placeholder="Airline"
-                className="form-control"
-                value={formData.inbound.airline}
-                onChange={(e) => handleChange(e, "inbound")}
-              />
-            </div>
-            <div className="col">
+          <h5 className="mt-4 text-dark">Return Flight</h5>
+          <div className="row g-3">
+            {["airline", "airport", "cost"].map((f) => (
+              <div key={f} className="col-md-3">
+                <input
+                  type={f === "cost" ? "number" : "text"}
+                  name={f}
+                  placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
+                  className="form-control"
+                  value={formData.inbound[f] || ""}
+                  onChange={(e) => handleChange(e, "inbound")}
+                />
+              </div>
+            ))}
+            <div className="col-md-3">
               <input
                 type="date"
                 name="date"
@@ -265,7 +244,7 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e, "inbound")}
               />
             </div>
-            <div className="col">
+            <div className="col-md-3">
               <input
                 type="time"
                 name="time"
@@ -274,31 +253,11 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e, "inbound")}
               />
             </div>
-            <div className="col">
-              <input
-                type="text"
-                name="airport"
-                placeholder="Airport"
-                className="form-control"
-                value={formData.inbound.airport}
-                onChange={(e) => handleChange(e, "inbound")}
-              />
-            </div>
-            <div className="col">
-              <input
-                type="number"
-                name="cost"
-                placeholder="Cost"
-                className="form-control"
-                value={formData.inbound.cost}
-                onChange={(e) => handleChange(e, "inbound")}
-              />
-            </div>
           </div>
 
-          <h6 className="mt-3">Hotel</h6>
-          <div className="row g-2 mb-2">
-            <div className="col">
+          <h5 className="mt-4 text-dark">Hotel</h5>
+          <div className="row g-3">
+            <div className="col-md-4">
               <input
                 type="text"
                 name="name"
@@ -308,7 +267,7 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e, "hotel")}
               />
             </div>
-            <div className="col">
+            <div className="col-md-4">
               <input
                 type="number"
                 name="nights"
@@ -318,7 +277,7 @@ function PlansDashboard() {
                 onChange={(e) => handleChange(e, "hotel")}
               />
             </div>
-            <div className="col">
+            <div className="col-md-4">
               <input
                 type="number"
                 name="totalCost"
@@ -345,22 +304,25 @@ function PlansDashboard() {
             </label>
           </div>
 
-          <button className="btn btn-success mt-3" onClick={savePlan}>
-            Save
+          <button className="btn btn-primary mt-4" onClick={savePlan}>
+            Save Plan
           </button>
         </div>
       )}
 
       {plans.map((plan) => (
-        <div key={plan.id} className="mb-4 p-3 border rounded">
-          <h3>
+        <div key={plan.id} className="p-4 mb-4 border rounded shadow-sm">
+          <h4 className="fw-bold text-dark">
             {plan.name}{" "}
-            {plan.is_public && <span className="badge bg-success">Public</span>}
-          </h3>
+            {plan.is_public && (
+              <span className="badge bg-primary ms-1">Public</span>
+            )}
+          </h4>
 
-          <p>
-            <strong>From:</strong> {plan.from} | <strong>To:</strong> {plan.to}{" "}
-            | <strong>Budget:</strong> {plan.budget}
+          <p className="mb-2">
+            <strong>From:</strong> {plan.from} &nbsp; | &nbsp;
+            <strong>To:</strong> {plan.to} &nbsp; | &nbsp;
+            <strong>Budget:</strong> ${plan.budget}
           </p>
 
           <button
@@ -371,7 +333,7 @@ function PlansDashboard() {
           </button>
 
           <button
-            className="btn btn-info btn-sm me-2"
+            className="btn btn-primary btn-sm me-2"
             onClick={() => handleViewPlan(plan)}
           >
             View Details
@@ -379,7 +341,7 @@ function PlansDashboard() {
 
           {plan.is_public && (
             <button
-              className="btn btn-secondary btn-sm"
+              className="btn btn-primary btn-sm"
               onClick={() =>
                 navigator.clipboard.writeText(
                   `${window.location.origin}/plan/${plan.id}`
@@ -395,52 +357,42 @@ function PlansDashboard() {
       {selectedPlan && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
         >
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
+            <div className="modal-content border-0 shadow">
               <div className="modal-header bg-primary text-white">
                 <h5 className="modal-title">{selectedPlan.name} Details</h5>
-                <button
-                  className="btn-close btn-close-white"
-                  onClick={closePopup}
-                ></button>
+                <button className="btn-close btn-close-white" onClick={closePopup}></button>
               </div>
 
               <div className="modal-body">
-                <p>
-                  <strong>From:</strong> {selectedPlan.from}
-                </p>
-                <p>
-                  <strong>To:</strong> {selectedPlan.to}
-                </p>
-                <p>
-                  <strong>Budget:</strong> {selectedPlan.budget}
-                </p>
+                <p><strong>From:</strong> {selectedPlan.from}</p>
+                <p><strong>To:</strong> {selectedPlan.to}</p>
+                <p><strong>Budget:</strong> ${selectedPlan.budget}</p>
 
                 <hr />
 
                 <p>
                   <strong>Outbound:</strong> {selectedPlan.outbound.airline},{" "}
                   {selectedPlan.outbound.time}, {selectedPlan.outbound.airport},{" "}
-                  {selectedPlan.outbound.cost}
+                  ${selectedPlan.outbound.cost}
                 </p>
 
                 <p>
                   <strong>Inbound:</strong> {selectedPlan.inbound.airline},{" "}
                   {selectedPlan.inbound.time}, {selectedPlan.inbound.airport},{" "}
-                  {selectedPlan.inbound.cost}
+                  ${selectedPlan.inbound.cost}
                 </p>
 
                 <p>
                   <strong>Hotel:</strong> {selectedPlan.hotel.name},{" "}
-                  {selectedPlan.hotel.nights} nights, Total:{" "}
-                  {selectedPlan.hotel.totalCost}
+                  {selectedPlan.hotel.nights} nights — ${selectedPlan.hotel.totalCost}
                 </p>
               </div>
 
               <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={closePopup}>
+                <button className="btn btn-primary" onClick={closePopup}>
                   Close
                 </button>
               </div>
@@ -448,6 +400,7 @@ function PlansDashboard() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
