@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import InputQuestion from "../components/survey/InputQuestion";
 import MultiChoiceWithOtherQuestion from "../components/survey/MultiChoiceWithOtherQuestion";
 import DateQuestion from "../components/survey/DateQuestion";
@@ -34,7 +35,6 @@ function Survey() {
     setLoading(true);
     setMessage("");
 
-    // date validation
     if (!formData.tripStartDate || !formData.tripEndDate) {
       setMessage("Please select both a start and end date.");
       setLoading(false);
@@ -72,19 +72,19 @@ function Survey() {
     };
 
     try {
-      console.log("Submitting survey:", finalData);
-
-      // Call backend to generate location + plans
       const { location, plans } = await generateTripFromSurvey(finalData);
+      const tripId = uuidv4();
 
-      // Redirect to GeneratedPlans page with the data
-      navigate("/generated-plans", {
-        state: {
+      sessionStorage.setItem(
+        `trip-${tripId}`,
+        JSON.stringify({
           location,
           plans,
           survey: finalData,
-        },
-      });
+        })
+      );
+
+      navigate(`/generated-plans/${tripId}`);
     } catch (err) {
       console.error(err);
       setMessage("Error generating trip plan. Please try again.");
@@ -107,7 +107,6 @@ function Survey() {
         </div>
 
         <form onSubmit={handleSubmit} className="question-stack">
-          {/* Destination type */}
           <div className="question-bubble">
             <MultiChoiceWithOtherQuestion
               label="Destination Type"
@@ -126,7 +125,6 @@ function Survey() {
             />
           </div>
 
-          {/* Budget */}
           <div className="question-bubble">
             <InputQuestion
               label="Budget"
@@ -140,7 +138,6 @@ function Survey() {
             />
           </div>
 
-          {/* Number of people */}
           <div className="question-bubble">
             <InputQuestion
               label="Number of People"
@@ -154,7 +151,6 @@ function Survey() {
             />
           </div>
 
-          {/* Trip dates */}
           <div className="question-bubble">
             <DateQuestion
               label="When are you planning to travel?"
@@ -166,7 +162,6 @@ function Survey() {
             />
           </div>
 
-          {/* Climate preference */}
           <div className="question-bubble">
             <MultiChoiceWithOtherQuestion
               label="Preferred Climate"
@@ -183,7 +178,6 @@ function Survey() {
             />
           </div>
 
-          {/* Trip vibe */}
           <div className="question-bubble">
             <MultiChoiceWithOtherQuestion
               label="Trip Vibe"
@@ -199,7 +193,6 @@ function Survey() {
             />
           </div>
 
-          {/* Departure city */}
           <div className="question-bubble">
             <InputQuestion
               label="Departure City or Airport"
@@ -211,7 +204,6 @@ function Survey() {
             />
           </div>
 
-          {/* Activities */}
           <div className="question-bubble">
             <MultiChoiceWithOtherQuestion
               label="Preferred Activities"
@@ -220,10 +212,7 @@ function Survey() {
                 { value: "Relaxing on the beach", label: "Relaxing on the beach" },
                 { value: "Sightseeing & culture", label: "Sightseeing & culture" },
                 { value: "Outdoor adventures", label: "Outdoor adventures" },
-                {
-                  value: "Nightlife & entertainment",
-                  label: "Nightlife & entertainment",
-                },
+                { value: "Nightlife & entertainment", label: "Nightlife & entertainment" },
                 { value: "Food & dining", label: "Food & dining" },
               ]}
               value={formData.activities}
@@ -234,7 +223,6 @@ function Survey() {
             />
           </div>
 
-          {/* Notes */}
           <div className="question-bubble">
             <InputQuestion
               label="Any must-haves or restrictions?"

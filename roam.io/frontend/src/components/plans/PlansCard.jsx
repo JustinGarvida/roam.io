@@ -8,76 +8,92 @@ function PlansCard({ plan, index, destinationLabel, survey, onSave }) {
   const checkOut = plan.checkOutDate || survey?.tripEndDate;
 
   const handleSaveClick = () => {
-    if (onSave) {
-      onSave(plan, index);
-    }
+    if (onSave) onSave(plan, index);
   };
 
   return (
-    <div className="card h-100 shadow-sm border-0">
-      <div className="card-body d-flex flex-column">
+    <div className="card shadow-sm border-0 rounded-3">
+      <div className="card-body">
+
         {/* Header */}
-        <div className="d-flex justify-content-between align-items-start mb-2">
+        <div className="d-flex justify-content-between align-items-start mb-3">
           <div>
-            <h5 className="card-title mb-1">
-              Option {index + 1}: {plan.destination || destinationLabel}
-            </h5>
-            {checkIn && checkOut && (
-              <p className="text-muted mb-0 small">
-                {checkIn} → {checkOut}
-              </p>
-            )}
+            <h4 className="fw-bold mb-1 text-dark">Option {index + 1}</h4>
+            <h6 className="fw-semibold text-dark mb-1">
+              {plan.destination || destinationLabel}
+            </h6>
           </div>
 
           {plan.totalTripPrice != null && (
             <div className="text-end">
-              <div className="fw-bold">
+              <div className="fw-bold fs-5 text-dark">
                 {currency} {plan.totalTripPrice}
               </div>
-              <div className="small text-muted">Estimated total</div>
+              <div className="small text-dark">Total Cost</div>
             </div>
           )}
         </div>
 
-        <hr />
+        {/* DATE CELLS */}
+        <div className="d-flex gap-3 mb-3">
+          <div className="flex-fill border rounded p-3 text-center bg-light">
+            <div className="fw-semibold text-dark">Check-in</div>
+            <div className="fs-6 text-dark">{checkIn}</div>
+          </div>
 
-        {/* Hotel section */}
+          <div className="flex-fill border rounded p-3 text-center bg-light">
+            <div className="fw-semibold text-dark">Check-out</div>
+            <div className="fs-6 text-dark">{checkOut}</div>
+          </div>
+        </div>
+
+        {/* HOTEL CELL */}
         {plan.hotel && (
-          <div className="mb-2">
-            <h6 className="text-uppercase small text-muted mb-1">Hotel</h6>
-            <p className="mb-1">
-              <strong>Name:</strong> {plan.hotel.name || "N/A"}
-            </p>
-            {plan.hotel.totalPrice && (
-              <p className="mb-0">
-                <strong>Price:</strong> {currency} {plan.hotel.totalPrice}
-              </p>
+          <div className="border rounded p-3 mb-3 bg-white">
+            <div className="fw-bold text-dark mb-1">Hotel</div>
+
+            <div className="d-flex justify-content-between">
+              <div className="text-dark">{plan.hotel.name || "N/A"}</div>
+
+              {plan.hotel.totalPrice && (
+                <div className="fw-semibold text-dark">
+                  {currency} {plan.hotel.totalPrice}
+                </div>
+              )}
+            </div>
+
+            {plan.hotel.address && (
+              <div className="small text-dark mt-1">{plan.hotel.address}</div>
             )}
           </div>
         )}
 
-        {/* Flight section */}
+        {/* FLIGHT CELL */}
         {plan.flight && (
-          <div className="mb-2">
-            <h6 className="text-uppercase small text-muted mb-1">Flight</h6>
-            {plan.flight.price && (
-              <p className="mb-1">
-                <strong>Price:</strong> {currency} {plan.flight.price}
-              </p>
-            )}
-            {plan.flight.departureDate && (
-              <p className="mb-0">
-                <strong>Departure date:</strong> {plan.flight.departureDate}
-              </p>
-            )}
+          <div className="border rounded p-3 mb-3 bg-white">
+            <div className="fw-bold text-dark mb-1">Flight</div>
+
+            <div className="d-flex justify-content-between">
+              <div>
+                <div className="fw-semibold text-dark">
+                  {plan.flight.origin} → {plan.flight.destination}
+                </div>
+              </div>
+
+              {plan.flight.price && (
+                <div className="fw-semibold text-dark">
+                  {currency} {plan.flight.price}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Spacer + Save button */}
-        <div className="mt-auto d-flex justify-content-end pt-2">
+        {/* SAVE BUTTON */}
+        <div className="d-flex justify-content-end">
           <button
             type="button"
-            className="btn btn-outline-primary btn-sm"
+            className="btn btn-primary btn-sm px-4"
             onClick={handleSaveClick}
           >
             Save Plan
