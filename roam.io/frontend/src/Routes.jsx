@@ -26,6 +26,7 @@ export default function AppRoutes() {
       <Route path="/trip-plans" element={<TripPlans />} />
       <Route path="/plan/:id" element={<PublicPlan />} />
       <Route path="/calendar" element={<Calendar />} />
+      <Route path="/generated-plans/:id" element={<GeneratedPlans />} />
     </Routes>
   );
 }
