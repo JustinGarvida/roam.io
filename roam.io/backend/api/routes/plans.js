@@ -54,7 +54,11 @@ router.post("/", async (req, res) => {
         numOptions: 5,
       });
 
-      return res.status(200).json({ plans: trips, trips });
+      return res.status(200).json({
+        location,
+        plans: trips,
+      });
+
     }
 
     const {
@@ -102,7 +106,11 @@ router.post("/", async (req, res) => {
       numOptions,
     });
 
-    return res.status(200).json({ plans: trips, trips });
+    return res.status(200).json({
+      location,
+      plans: trips,
+    });
+
   } catch (err) {
     console.error("Error generating trips:", err);
     return res.status(500).json({
