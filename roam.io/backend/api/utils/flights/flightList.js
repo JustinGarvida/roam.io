@@ -1,6 +1,37 @@
 let axios = require("axios");
 let { getAmadeusToken } = require("../amadeusToken");
-let AMADEUS_CHEAPEST_DATES_URL = "https://test.api.amadeus.com/v1/shopping/flight-dates";
+let AMADEUS_CHEAPEST_DATES_URL =
+  "https://test.api.amadeus.com/v1/shopping/flight-dates";
+
+function buildDummyFlights({ origin, destination, departureDate }) {
+  const baseDeparture = departureDate || "2025-12-19";
+  return [
+    {
+      origin,
+      destination,
+      departureDate: baseDeparture,
+      returnDate: "2025-12-26",
+      price: 650.0,
+      links: { self: "https://example.com/dummy-flight-1" },
+    },
+    {
+      origin,
+      destination,
+      departureDate: "2025-12-20",
+      returnDate: "2025-12-27",
+      price: 720.0,
+      links: { self: "https://example.com/dummy-flight-2" },
+    },
+    {
+      origin,
+      destination,
+      departureDate: "2025-12-21",
+      returnDate: "2025-12-28",
+      price: 810.0,
+      links: { self: "https://example.com/dummy-flight-3" },
+    },
+  ];
+}
 
 async function getCheapestFlightDates({
   origin,
@@ -16,8 +47,8 @@ async function getCheapestFlightDates({
     throw new Error("origin and destination are required");
   }
 
-  let token = await getAmadeusToken();
-  let params = { origin, destination };
+  const token = await getAmadeusToken();
+  const params = { origin, destination };
 
   if (departureDate) params.departureDate = departureDate;
   if (oneWay != null) params.oneWay = oneWay;
@@ -27,14 +58,14 @@ async function getCheapestFlightDates({
   if (viewBy) params.viewBy = viewBy;
 
   try {
-    let response = await axios.get(AMADEUS_CHEAPEST_DATES_URL, {
+    const response = await axios.get(AMADEUS_CHEAPEST_DATES_URL, {
       headers: { Authorization: `Bearer ${token}` },
       params,
     });
 
-    let items = response.data?.data || [];
+    const items = response.data && response.data.data ? response.data.data : [];
 
-    let flights = items.map((item) => ({
+    const allFlights = items.map((item) => ({
       origin: item.origin,
       destination: item.destination,
       departureDate: item.departureDate,
@@ -43,57 +74,25 @@ async function getCheapestFlightDates({
       links: item.links,
     }));
 
-    if (flights.length === 0) return null;
+    if (allFlights.length === 0) {
+      return null;
+    }
 
-    flights.sort((a, b) => a.price - b.price);
-    return flights.slice(0, 5);
+    allFlights.sort((a, b) => a.price - b.price);
+    return allFlights.slice(0, 5);
   } catch (error) {
-    console.warn("Amadeus 500 error → returning dummy data");
+    if (error.response && error.response.status === 500) {
+      console.warn(
+        "Amadeus returned 500, falling back to dummy flight data:",
+        JSON.stringify(error.response.data, null, 2)
+      );
+      const dummy = buildDummyFlights({ origin, destination, departureDate });
 
-    return [
-      {
-        origin,
-        destination,
-        departureDate: "2025-12-20",
-        returnDate: "2025-12-27",
-        price: "550.00",
-        links: { self: "dummy-1" },
-      },
-      {
-        origin,
-        destination,
-        departureDate: "2025-12-21",
-        returnDate: "2025-12-28",
-        price: "620.00",
-        links: { self: "dummy-2" },
-      },
-      {
-        origin,
-        destination,
-        departureDate: "2025-12-22",
-        returnDate: "2025-12-29",
-        price: "700.00",
-        links: { self: "dummy-3" },
-      },
-      {
-        origin,
-        destination,
-        departureDate: "2025-12-23",
-        returnDate: "2025-12-30",
-        price: "750.00",
-        links: { self: "dummy-4" },
-      },
-      {
-        origin,
-        destination,
-        departureDate: "2025-12-24",
-        returnDate: "2025-12-31",
-        price: "800.00",
-        links: { self: "dummy-5" },
-      },
-    ];
+      dummy.sort((a, b) => a.price - b.price);
+      return dummy.slice(0, 5);
+    }
+    throw error;
   }
 }
-
 
 module.exports = { getCheapestFlightDates };

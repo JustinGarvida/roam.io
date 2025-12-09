@@ -1,6 +1,6 @@
-// src/pages/GeneratedPlans.jsx
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import PlansCard from "../components/plans/PlansCard";
 
 function GeneratedPlans() {
   const { state } = useLocation();
@@ -23,8 +23,14 @@ function GeneratedPlans() {
   const destinationLabel =
     location?.displayName || location?.location || location?.city || "Your trip";
 
+  const handleSavePlan = (plan, index) => {
+    // placeholder for future functionality
+    console.log("Save clicked for plan", index + 1, plan);
+  };
+
   return (
     <div className="container py-5">
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="mb-1">Generated Trip Plans</h2>
@@ -46,63 +52,18 @@ function GeneratedPlans() {
         </button>
       </div>
 
+      {/* Plans */}
       {plans && plans.length > 0 ? (
         <div className="row gy-3">
           {plans.map((plan, idx) => (
             <div key={idx} className="col-12 col-md-6">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                  <h5 className="card-title">
-                    Option {idx + 1}:{" "}
-                    {plan.destination || destinationLabel}
-                  </h5>
-
-                  <p className="card-text mb-1">
-                    <strong>Check-in:</strong>{" "}
-                    {plan.checkInDate || survey?.tripStartDate}
-                  </p>
-                  <p className="card-text mb-1">
-                    <strong>Check-out:</strong>{" "}
-                    {plan.checkOutDate || survey?.tripEndDate}
-                  </p>
-
-                  {plan.totalTripPrice != null && (
-                    <p className="card-text mb-1">
-                      <strong>Estimated total:</strong>{" "}
-                      {plan.currency || "USD"} {plan.totalTripPrice}
-                    </p>
-                  )}
-
-                  {plan.hotel && (
-                    <>
-                      <p className="card-text mb-1">
-                        <strong>Hotel:</strong> {plan.hotel.name}
-                      </p>
-                      {plan.hotel.totalPrice && (
-                        <p className="card-text mb-1">
-                          <strong>Hotel price:</strong>{" "}
-                          {plan.currency || "USD"} {plan.hotel.totalPrice}
-                        </p>
-                      )}
-                    </>
-                  )}
-
-                  {plan.flight && (
-                    <>
-                      <p className="card-text mb-1">
-                        <strong>Flight price:</strong>{" "}
-                        {plan.currency || "USD"} {plan.flight.price}
-                      </p>
-                      {plan.flight.departureDate && (
-                        <p className="card-text mb-0">
-                          <strong>Flight date:</strong>{" "}
-                          {plan.flight.departureDate}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+              <PlansCard
+                plan={plan}
+                index={idx}
+                destinationLabel={destinationLabel}
+                survey={survey}
+                onSave={handleSavePlan}
+              />
             </div>
           ))}
         </div>
